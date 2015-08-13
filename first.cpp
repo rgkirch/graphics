@@ -3,12 +3,12 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 
-void error_callback(int error, const char* description)
+void error_callback( int error, const char* description )
 {
 	fputs(description, stderr);
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+static void key_callback( GLFWwindow* window, int key, int scancode, int action, int mode )
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -30,14 +30,12 @@ int main(void)
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
         return -1;
     }
-
-	glfwSetKeyCallback(window, key_callback);
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
@@ -46,19 +44,23 @@ int main(void)
 	if( glewInit() != GLEW_OK )
 	{
 		//Problem: glewInit failed, something is seriously wrong.
-		printf( "glewInit failed, aborting.\n" );
+		printf( "glewInit() failed, aborting.\n" );
 	}
 
-    /* Loop until the user closes the window */
+	glViewport(0, 0, 800, 600);
+
+	glfwSetKeyCallback(window, key_callback);
+
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
     while (!glfwWindowShouldClose(window))
     {
+		glClear(GL_COLOR_BUFFER_BIT);
+        glfwPollEvents();
+
         /* Render here */
 
-        /* Swap front and back buffers */
         glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
     }
 
 	glfwDestroyWindow( window );

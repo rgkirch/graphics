@@ -69,8 +69,9 @@ int main()
 
 	glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
 
-	// Vertex shader
+	// VERTEX SHADER
 	GLuint vertexShader = glCreateShader( GL_VERTEX_SHADER );
+	// void glShaderSource(	GLuint shader, GLsizei count, const GLchar **string, const GLint *length);
 	glShaderSource( vertexShader, 1, &vertexShaderSource, NULL );
 	glCompileShader( vertexShader );
 	// Check for compile time errors
@@ -81,7 +82,7 @@ int main()
 		glGetShaderInfoLog( vertexShader, 512, NULL, infoLog );
 		printf( "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog );
 	}
-	// fragment shader
+	// FRAGMENT SHADER
 	GLuint fragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
 	glShaderSource( fragmentShader, 1, &fragmentShaderSource, NULL );
 	glCompileShader( fragmentShader );
@@ -109,8 +110,8 @@ int main()
 	// Set up vertex data (and buffer(s)) and attribute pointers
 	GLfloat vertices[] = {
 		-0.5f, -0.5f, 0.0f, // Left  
-		 0.5f, -0.5f, 0.0f, // Right 
-		 0.0f,	0.5f, 0.0f	// Top	 
+		0.5f, -0.5f, 0.0f, // Right 
+		 0.5f,	0.5f, 0.0f	// Top	 
 	};
 	// vertex buffer object (VBO)
 	// vertex array object (VAO)
@@ -123,6 +124,7 @@ int main()
 	glBindBuffer( GL_ARRAY_BUFFER, VBO );
 	glBufferData( GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW );
 
+	// void glVertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer);
 	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0 );
 	glEnableVertexAttribArray( 0 );
 
@@ -133,8 +135,8 @@ int main()
 	// Game loop
 
 	while( !glfwWindowShouldClose( window ) ) {
-		glfwPollEvents();
 		glClear( GL_COLOR_BUFFER_BIT );
+		glfwPollEvents();
 
 		// Draw our first triangle
 		glUseProgram( shaderProgram );

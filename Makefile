@@ -1,4 +1,4 @@
-GLEW = -lGL
+GLEW = -lGLEW -lGLU -lGL
 GLFW = -lglfw
 INCLUDE = -I/usr/include
 DEBUG = -g

@@ -18,13 +18,6 @@ int main(void)
 {
     GLFWwindow* window;
 
-	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK)
-	{
-		std::cout << "Failed to initialize GLEW" << std::endl;
-		return -1;
-	}
-
 	glfwSetErrorCallback(error_callback);
 
     /* Initialize the library */
@@ -48,6 +41,13 @@ int main(void)
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+
+	glewExperimental = GL_TRUE;
+	if( glewInit() != GLEW_OK )
+	{
+		//Problem: glewInit failed, something is seriously wrong.
+		printf( "glewInit failed, aborting.\n" );
+	}
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))

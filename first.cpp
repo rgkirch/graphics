@@ -18,19 +18,37 @@ static void key_callback( GLFWwindow* window, int key, int scancode, int action,
 	}
 }
 
+void fps() {
+	static GLuint frames = 0;
+	static GLfloat fpsTimeout = 0.0f;
+	if( fpsTimeout == 0.0f ) {
+		fpsTimeout = glfwGetTime() + 1.0f;
+	}
+	if( glfwGetTime() > fpsTimeout ) {
+		fpsTimeout = glfwGetTime() + 1.0f;
+		printf( "%d fps\n", frames);
+		frames = 0;
+	}
+	++frames;
+}
+
 const GLchar* vertexShaderSource = "#version 330 core\n"
 	// declare inputs with the 'in' keyword
 	// set the location to be used later
 	"layout (location = 0) in vec3 position;\n"
+	"layout (location = 1) in vec3 oneColor;\n"
+	"out vec3 twoColor;\n"
 	"void main()\n"
 	"{\n"
-	"gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
+	"twoColor = oneColor;\n"
+	"gl_Position = vec4( position, 1.0 );\n"
 	"}\0";
 const GLchar* fragmentShaderSource = "#version 330 core\n"
-	"out vec4 color;\n"
+	"in vec3 twoColor;\n"
+	"out vec4 threeColor;\n"
 	"void main()\n"
 	"{\n"
-	"color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+	"threeColor = vec4( twoColor, 1.0f );\n"
 	"}\n\0";
 
 int main()
@@ -109,27 +127,30 @@ int main()
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
 	GLfloat vertices[] = {
-		-0.5f, -0.5f, 0.0f, // Left  
-		0.5f, -0.5f, 0.0f, // Right 
-		 0.5f,	0.5f, 0.0f	// Top	 
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.2f,
+		0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.2f,
+		0.5f, 0.5f, 0.0f, 1.0f, 0.5f, 0.2f,
+		-1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 
+		0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 
+		-1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
 	};
 	// vertex buffer object (VBO)
 	// vertex array object (VAO)
 	GLuint VBO, VAO;
 	glGenVertexArrays( 1, &VAO );
 	glGenBuffers( 1, &VBO );
-	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+	// BIND the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
 	glBindVertexArray( VAO );
+		glBindBuffer( GL_ARRAY_BUFFER, VBO );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW );
 
-	glBindBuffer( GL_ARRAY_BUFFER, VBO );
-	glBufferData( GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW );
-
-	// void glVertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer);
-	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0 );
-	glEnableVertexAttribArray( 0 );
-
-	glBindBuffer( GL_ARRAY_BUFFER, 0 ); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
-
+		// void glVertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer);
+		// the 0 for index comes from location = 0 in the vertex shader
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0 );
+		glEnableVertexAttribArray( 0 );
+		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)) );
+		glEnableVertexAttribArray( 1 );
+		//glBindBuffer( GL_ARRAY_BUFFER, 0 ); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 	glBindVertexArray( 0 ); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
 
 	// Game loop
@@ -141,10 +162,11 @@ int main()
 		// Draw our first triangle
 		glUseProgram( shaderProgram );
 		glBindVertexArray( VAO );
-		glDrawArrays( GL_TRIANGLES, 0, 3 );
+		glDrawArrays( GL_TRIANGLES, 0, 6 );
 		glBindVertexArray( 0 );
 
 		glfwSwapBuffers( window );
+		fps();
 	}
 
 	glDeleteVertexArrays( 1, &VAO );

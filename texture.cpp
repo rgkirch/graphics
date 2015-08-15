@@ -1,7 +1,13 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include <stdio.h>
+
+#include "shader.hpp"
 
 const GLuint WIDTH = 800, HEIGHT = 600;
 
@@ -32,6 +38,7 @@ void fps() {
 	++frames;
 }
 
+/*
 const GLchar* vertexShaderSource = "#version 330 core\n"
 	// declare inputs with the 'in' keyword
 	// set the location to be used later
@@ -50,6 +57,7 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
 	"{\n"
 	"threeColor = vec4( twoColor, 1.0f );\n"
 	"}\n\0";
+*/
 
 int main()
 {
@@ -87,6 +95,7 @@ int main()
 
 	glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
 
+	/*
 	// VERTEX SHADER
 	GLuint vertexShader = glCreateShader( GL_VERTEX_SHADER );
 	// void glShaderSource(	GLuint shader, GLsizei count, const GLchar **string, const GLint *length);
@@ -123,7 +132,9 @@ int main()
 	}
 	glDeleteShader( vertexShader );
 	glDeleteShader( fragmentShader );
+	*/
 
+	Shader shader( "./vertexShader", "./fragmentShader" );
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
 	GLfloat vertices[] = {
@@ -160,7 +171,8 @@ int main()
 		glfwPollEvents();
 
 		// Draw our first triangle
-		glUseProgram( shaderProgram );
+		//glUseProgram( shaderProgram );
+		shader.useProgram();
 		glBindVertexArray( VAO );
 		glDrawArrays( GL_TRIANGLES, 0, 6 );
 		glBindVertexArray( 0 );

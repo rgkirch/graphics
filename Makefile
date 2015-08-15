@@ -1,4 +1,4 @@
-target = main.cpp
+target = 
 GLEW = -lGLEW -lGLU -lGL
 GLFW = -lglfw
 INCLUDE = -I/usr/include

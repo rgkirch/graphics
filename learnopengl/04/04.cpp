@@ -8,7 +8,7 @@
 #include <GLFW/glfw3.h>
 
 // Other Libs
-#include <SOIL.h>
+#include "stb_image.h"
 
 // Other includes
 #include "Shader.h"

@@ -200,7 +200,8 @@ int main() {
 		glm::mat4 model;
 		glm::mat4 view;
 		glm::mat4 projection;
-		model = glm::rotate( model, glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f) );
+		model = glm::rotate( model, glm::radians(cursorPositionX - WIDTH/2), glm::vec3(0.0f, 1.0f, 0.0f) );
+		model = glm::rotate( model, glm::radians(cursorPositionY - HEIGHT/2), glm::vec3(1.0f, 0.0f, 0.0f) );
 		view = glm::translate( view, glm::vec3( 0.0f, 0.0f, -3.0f ) );
 		projection = glm::perspective( 45.0f, (GLfloat)WIDTH/HEIGHT, 0.1f, 100.0f );
 		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "model" ), 1, GL_FALSE, glm::value_ptr(model) );

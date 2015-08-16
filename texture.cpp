@@ -96,6 +96,7 @@ int main() {
 	glViewport( 0, 0, WIDTH, HEIGHT );
 
 	glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
+	glEnable( GL_DEPTH_TEST );
 
 	// SHADER
 	Shader shader( "./vertexShader.glsl", "./fragmentShader.glsl" );
@@ -108,13 +109,13 @@ int main() {
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
 	GLfloat vertices[] = {
-		-1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
+		-1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
 		-1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
-		-1.0f,  1.0f, -1.0f,  0.0f, 1.0f,
+		-1.0f,  1.0f, -1.0f,  1.0f, 1.0f,
 		-1.0f,  1.0f,  1.0f,  0.0f, 1.0f,
-		 1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
+		 1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
 		 1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
-		 1.0f,  1.0f, -1.0f,  1.0f, 1.0f,
+		 1.0f,  1.0f, -1.0f,  0.0f, 1.0f,
 		 1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
 	};
     GLuint indices[] = {
@@ -207,7 +208,8 @@ int main() {
 
 	// Game loop
 	while( !glfwWindowShouldClose( window ) ) {
-		glClear( GL_COLOR_BUFFER_BIT );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
 		glfwPollEvents();
 
 		glActiveTexture( GL_TEXTURE0 );

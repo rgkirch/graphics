@@ -109,11 +109,11 @@ int main() {
 
 		// void glVertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer);
 		// the 0 for index comes from location = 0 in the vertex shader
-		glEnableVertexAttribArray( 0 );
 		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0 );
-		glEnableVertexAttribArray( 1 );
 		glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)) );
-	glBindVertexArray( 0 ); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
+		glEnableVertexAttribArray( 0 );
+		glEnableVertexAttribArray( 1 );
+	glBindVertexArray( 0 );
 
 
 
@@ -125,9 +125,7 @@ int main() {
 	// TEXTURE
     GLuint texture;
     glGenTextures(1, &texture);
-	glActiveTexture( GL_TEXTURE0 );
     glBindTexture(GL_TEXTURE_2D, texture); // All upcoming GL_TEXTURE_2D operations now have effect on our texture object
-	glUniform1i( glGetUniformLocation(shader.Program, "texture"), texture );
     // Set our texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -136,11 +134,29 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // Load, create texture and generate mipmaps
     int width, height, comp;
-    unsigned char* image = stbi_load("./images/container.jpg", &width, &height, &comp, 0);
+    unsigned char* image = stbi_load("./images/container.jpg", &width, &height, &comp, 3);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(image);
-    glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+
+
+    GLuint texture1;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    // Set our texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // Set texture filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // Load, create texture and generate mipmaps
+    image = stbi_load("./images/awesomeface.png", &width, &height, &comp, 3 );
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(image);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 
 
@@ -157,16 +173,24 @@ int main() {
 
 		// Draw our first triangle
 		//glUseProgram( shaderProgram );
-        glBindTexture(GL_TEXTURE_2D, texture);
 		shader.useProgram();
 
-		glBindVertexArray( VAO );
-		//glDrawArrays( GL_TRIANGLES, 0, 3 );
-		//glBindVertexArray( 0 );
+		glActiveTexture( GL_TEXTURE0 );
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glUniform1i( glGetUniformLocation(shader.Program, "texture"), 0 );
 
+		glActiveTexture( GL_TEXTURE1 );
+		glBindTexture(GL_TEXTURE_2D, texture1);
+		glUniform1i( glGetUniformLocation(shader.Program, "texture1"), 1 );
+
+		glBindVertexArray( VAO );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
+
+		//glDrawArrays( GL_TRIANGLES, 0, 3 );
 		glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+		glBindVertexArray( 0 );
 
 		glfwSwapBuffers( window );
 		fps();

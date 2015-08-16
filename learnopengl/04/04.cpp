@@ -33,7 +33,7 @@ int main()
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     // Create a GLFWwindow object that we can use for GLFW's functions
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);
     glfwMakeContextCurrent(window);
 
     // Set the required callback functions
@@ -49,7 +49,7 @@ int main()
 
 
     // Build and compile our shader program
-    Shader ourShader("texture", "texture");
+    Shader ourShader("./vertex", "./fragment");
 
 
     // Set up vertex data (and buffer(s)) and attribute pointers
@@ -107,6 +107,7 @@ int main()
     // Load, create texture and generate mipmaps
     int width, height, comp;
     unsigned char* image = stbi_load("../../images/container.jpg", &width, &height, &comp, 0 );
+	printf( "comp1: %d\n", comp );
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(image);
@@ -123,7 +124,8 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // Load, create texture and generate mipmaps
-    image = stbi_load("../../images/awesomeface.png", &width, &height, &comp, 0 );
+    image = stbi_load("../../images/awesomeface.png", &width, &height, &comp, 3 );
+	printf( "comp2: %d\n", comp );
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(image);

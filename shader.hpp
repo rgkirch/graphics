@@ -84,8 +84,17 @@ public:
 			printf( "ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
 		}
 		// Delete the shaders as they're linked into our program now and no longer necessery
+		glDetachShader( this->Program, vertex );
+		glDetachShader( this->Program, fragment );
 		glDeleteShader(vertex);
 		glDeleteShader(fragment);
+		glValidateProgram( this->Program );
+		glGetProgramiv(this->Program, GL_VALIDATE_STATUS, &success);
+		if (!success)
+		{
+			glGetProgramInfoLog(this->Program, 512, NULL, infoLog);
+			printf( "ERROR::SHADER::PROGRAM::VALIDATION_FAILED\n%s\n", infoLog);
+		}
 
 	}
 	// Uses the current shader

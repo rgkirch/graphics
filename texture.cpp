@@ -6,12 +6,16 @@
 #include "stb/stb_image.h"
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <stdio.h>
 
 #include "shader.hpp"
 
 const GLuint WIDTH = 800, HEIGHT = 600;
+GLfloat cursorPositionX = 0;
+GLfloat cursorPositionY = 0;
 
 void error_callback( int error, const char* description )
 {
@@ -19,11 +23,17 @@ void error_callback( int error, const char* description )
 	//fputs( description, stderr );
 }
 
-static void key_callback( GLFWwindow* window, int key, int scancode, int action, int mode )
+static void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods )
 {
 	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
 		glfwSetWindowShouldClose( window, GL_TRUE );
 	}
+}
+
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+	cursorPositionX = xpos;
+	cursorPositionY = ypos;
+	//printf( "%f %f\n", xpos, ypos );
 }
 
 void fps() {
@@ -66,6 +76,7 @@ int main() {
 	glfwMakeContextCurrent( window );
 
 	glfwSetKeyCallback( window, key_callback );
+	glfwSetCursorPosCallback(window, cursor_position_callback);
 
 	glewExperimental = GL_TRUE;
 	if( glewInit() != GLEW_OK ) {
@@ -87,10 +98,10 @@ int main() {
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
     GLfloat vertices[] = {
-         0.5f,  0.5f, 0.0f,  1.0f, 1.0f,
-         0.5f, -0.5f, 0.0f,  1.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f,  0.0f, 1.0f
+         1.0f,  1.0f, 0.0f,  1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f,  0.0f, 1.0f
     };
     GLuint indices[] = {
         0, 1, 3, // First Triangle
@@ -175,10 +186,6 @@ int main() {
 		glClear( GL_COLOR_BUFFER_BIT );
 		glfwPollEvents();
 
-		// Draw our first triangle
-		glUseProgram( shader.Program );
-		//shader.useProgram();
-
 		glActiveTexture( GL_TEXTURE0 );
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glUniform1i( glGetUniformLocation(shader.Program, "texture"), 0 );
@@ -187,13 +194,23 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texture1);
 		glUniform1i( glGetUniformLocation(shader.Program, "texture1"), 1 );
 
-		glBindVertexArray( VAO );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
+		glUseProgram( shader.Program );
 
+
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 projection;
+		model = glm::rotate( model, glm::radians(-45.0f), glm::vec3(1.0f, 0.0f, 0.0f) );
+		view = glm::translate( view, glm::vec3( 0.0f, 0.0f, -3.0f ) );
+		projection = glm::perspective( 45.0f, (GLfloat)WIDTH/HEIGHT, 0.1f, 100.0f );
+		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "model" ), 1, GL_FALSE, glm::value_ptr(model) );
+		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "view" ), 1, GL_FALSE, glm::value_ptr(view) );
+		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "projection" ), 1, GL_FALSE, glm::value_ptr(projection) );
+
+
+		glBindVertexArray( VAO );
 		//glDrawArrays( GL_TRIANGLES, 0, 3 );
 		glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
-
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 		glBindVertexArray( 0 );
 
 		glfwSwapBuffers( window );

@@ -37,6 +37,8 @@ flags = [
     '-x',
     'c++',
     '-I/usr/include',
+    '-I/usr/local/include',
+    '-I./',
 ]
 
 

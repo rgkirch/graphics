@@ -160,7 +160,7 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, texture);
 		shader.useProgram();
 
-		//glBindVertexArray( VAO );
+		glBindVertexArray( VAO );
 		//glDrawArrays( GL_TRIANGLES, 0, 3 );
 		//glBindVertexArray( 0 );
 

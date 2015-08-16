@@ -38,8 +38,8 @@ void fps() {
 	++frames;
 }
 
-int main()
-{
+int main() {
+	// INIT
 	GLFWwindow* window;
 
 	glfwSetErrorCallback( error_callback );
@@ -74,15 +74,21 @@ int main()
 
 	glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
 
+	// SHADER
 	Shader shader( "./vertexShader.glsl", "./fragmentShader.glsl" );
+
+
+
+
+
+
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
     GLfloat vertices[] = {
-        // Positions          // Colors           // Texture Coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f
+         0.5f,  0.5f, 0.0f,  1.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,  1.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f,  0.0f, 1.0f
     };
     GLuint indices[] = {
         0, 1, 3, // First Triangle
@@ -90,7 +96,7 @@ int main()
     };
 	// vertex buffer object (VBO)
 	// vertex array object (VAO)
-	GLuint VBO, VAO, EBO;
+	GLuint VAO, VBO, EBO;
 	glGenVertexArrays( 1, &VAO );
 	glGenBuffers( 1, &VBO );
 	glGenBuffers( 1, &EBO );
@@ -98,23 +104,30 @@ int main()
 	glBindVertexArray( VAO );
 		glBindBuffer( GL_ARRAY_BUFFER, VBO );
 		glBufferData( GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW );
 
 		// void glVertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer);
 		// the 0 for index comes from location = 0 in the vertex shader
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0 );
 		glEnableVertexAttribArray( 0 );
-		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)) );
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0 );
 		glEnableVertexAttribArray( 1 );
-		glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)) );
-		glEnableVertexAttribArray( 2 );
+		glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)) );
 	glBindVertexArray( 0 ); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
 
-    GLuint texture1, texture2;
-    // ====================
-    // Texture 1
-    // ====================
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1); // All upcoming GL_TEXTURE_2D operations now have effect on our texture object
+
+
+
+
+
+
+
+	// TEXTURE
+    GLuint texture;
+    glGenTextures(1, &texture);
+	glActiveTexture( GL_TEXTURE0 );
+    glBindTexture(GL_TEXTURE_2D, texture); // All upcoming GL_TEXTURE_2D operations now have effect on our texture object
+	glUniform1i( glGetUniformLocation(shader.Program, "texture"), texture );
     // Set our texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -128,36 +141,32 @@ int main()
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(image);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
-    // ===================
-    // Texture 2
-    // ===================
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // Set our texture parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // Set texture filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // Load, create texture and generate mipmaps
-    image = stbi_load("./images/awesomeface.png", &width, &height, &comp, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(image);
-    glBindTexture(GL_TEXTURE_2D, 0);
+
+
+
+
+
+
+
+
 
 	// Game loop
-
 	while( !glfwWindowShouldClose( window ) ) {
 		glClear( GL_COLOR_BUFFER_BIT );
 		glfwPollEvents();
 
 		// Draw our first triangle
 		//glUseProgram( shaderProgram );
+        glBindTexture(GL_TEXTURE_2D, texture);
 		shader.useProgram();
-		glBindVertexArray( VAO );
-		glDrawArrays( GL_TRIANGLES, 0, 6 );
-		glBindVertexArray( 0 );
+
+		//glBindVertexArray( VAO );
+		//glDrawArrays( GL_TRIANGLES, 0, 3 );
+		//glBindVertexArray( 0 );
+
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
+		glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
 		glfwSwapBuffers( window );
 		fps();

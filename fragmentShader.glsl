@@ -1,7 +1,11 @@
 #version 330 core
 
-in vec3 twoColor;
-out vec4 threeColor;
+in vec2 twoTexCo;
+out vec4 color;
+
+uniform sampler2D texture;
+
 void main() {
-	threeColor = vec4( twoColor, 1.0f );
+	//color = texture2D( texture, twoTexCo );
+	color = vec4( 1.0f, 1.0f, 1.0f, 1.0f );
 }

@@ -8,12 +8,10 @@
 #include <GLFW/glfw3.h>
 
 // Other Libs
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "../../stb/stb_image.h"
 
 // Other includes
-#include "shader.hpp"
-
+#include "../../shader.hpp"
 
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -49,7 +47,7 @@ int main()
 
 
     // Build and compile our shader program
-    Shader ourShader("texture", "texture");
+    Shader ourShader("path/to/shaders/textures.vs", "path/to/shaders/textures.frag");
 
 
     // Set up vertex data (and buffer(s)) and attribute pointers
@@ -91,43 +89,22 @@ int main()
 
 
     // Load and create a texture 
-    GLuint texture1;
-    GLuint texture2;
-    // ====================
-    // Texture 1
-    // ====================
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1); // All upcoming GL_TEXTURE_2D operations now have effect on our texture object
-    // Set our texture parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture); // All upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    // Set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT (usually basic wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // Set texture filtering
+    // Set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // Load, create texture and generate mipmaps
-    int width, height, comp;
-    unsigned char* image = stbi_load("../../images/container.jpg", &width, &height, &comp, 0 );
+    // Load image, create texture and generate mipmaps
+    int width, height;
+    unsigned char* image = SOIL_load_image("container.jpg", &width, &height, 0, SOIL_LOAD_RGB);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(image);
+    SOIL_free_image_data(image);
     glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
-    // ===================
-    // Texture 2
-    // ===================
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // Set our texture parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // Set texture filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // Load, create texture and generate mipmaps
-    image = stbi_load("../../images/awesomeface.png", &width, &height, &comp, 0 );
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(image);
-    glBindTexture(GL_TEXTURE_2D, 0);
 
 
     // Game loop
@@ -141,16 +118,12 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Activate shader
-        ourShader.useProgram();     
 
-        // Bind Textures using texture units
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
-        glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);  
+        // Bind Texture
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        // Activate shader
+        ourShader.Use();       
         
         // Draw container
         glBindVertexArray(VAO);

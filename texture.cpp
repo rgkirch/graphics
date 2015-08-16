@@ -5,6 +5,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
+#include <glm/glm.hpp>
+
 #include <stdio.h>
 
 #include "shader.hpp"
@@ -126,6 +128,7 @@ int main() {
 	// TEXTURE
     GLuint texture;
     glGenTextures(1, &texture);
+	//printf( "texture: %d\n", texture );
     glBindTexture(GL_TEXTURE_2D, texture); // All upcoming GL_TEXTURE_2D operations now have effect on our texture object
     // Set our texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT
@@ -144,6 +147,7 @@ int main() {
 
     GLuint texture1;
     glGenTextures(1, &texture1);
+	//printf( "texture1: %d\n", texture1 );
     glBindTexture(GL_TEXTURE_2D, texture1);
     // Set our texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT
@@ -172,8 +176,8 @@ int main() {
 		glfwPollEvents();
 
 		// Draw our first triangle
-		//glUseProgram( shaderProgram );
-		shader.useProgram();
+		glUseProgram( shader.Program );
+		//shader.useProgram();
 
 		glActiveTexture( GL_TEXTURE0 );
 		glBindTexture(GL_TEXTURE_2D, texture);

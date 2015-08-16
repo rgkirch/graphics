@@ -1,0 +1,33 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+GLEW_STATIC	color.cpp	1;"	d	file:
+GLEW_STATIC	texture.cpp	1;"	d	file:
+HEIGHT	color.cpp	/^const GLuint WIDTH = 800, HEIGHT = 600;$/;"	v
+HEIGHT	hellowindow2.cpp	/^const GLuint WIDTH = 800, HEIGHT = 600;$/;"	v
+HEIGHT	texture.cpp	/^const GLuint WIDTH = 800, HEIGHT = 600;$/;"	v
+Program	shader.hpp	/^	GLuint Program;$/;"	m	class:Shader
+SHADER_H	shader.hpp	2;"	d
+STB_IMAGE_IMPLEMENTATION	color.cpp	5;"	d	file:
+STB_IMAGE_IMPLEMENTATION	texture.cpp	5;"	d	file:
+Shader	shader.hpp	/^	Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {$/;"	f	class:Shader
+Shader	shader.hpp	/^class Shader {$/;"	c
+WIDTH	color.cpp	/^const GLuint WIDTH = 800, HEIGHT = 600;$/;"	v
+WIDTH	hellowindow2.cpp	/^const GLuint WIDTH = 800, HEIGHT = 600;$/;"	v
+WIDTH	texture.cpp	/^const GLuint WIDTH = 800, HEIGHT = 600;$/;"	v
+error_callback	color.cpp	/^void error_callback( int error, const char* description )$/;"	f
+error_callback	texture.cpp	/^void error_callback( int error, const char* description )$/;"	f
+fps	color.cpp	/^void fps() {$/;"	f
+fps	texture.cpp	/^void fps() {$/;"	f
+fragmentShaderSource	color.cpp	/^const GLchar* fragmentShaderSource = "#version 330 core\\n"$/;"	v
+key_callback	color.cpp	/^static void key_callback( GLFWwindow* window, int key, int scancode, int action, int mode )$/;"	f	file:
+key_callback	hellowindow2.cpp	/^void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)$/;"	f
+key_callback	texture.cpp	/^static void key_callback( GLFWwindow* window, int key, int scancode, int action, int mode )$/;"	f	file:
+main	color.cpp	/^int main()$/;"	f
+main	hellowindow2.cpp	/^int main()$/;"	f
+main	texture.cpp	/^int main() {$/;"	f
+useProgram	shader.hpp	/^	void useProgram() { $/;"	f	class:Shader
+vertexShaderSource	color.cpp	/^const GLchar* vertexShaderSource = "#version 330 core\\n"$/;"	v

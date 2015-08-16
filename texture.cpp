@@ -14,8 +14,10 @@
 #include "shader.hpp"
 
 const GLuint WIDTH = 800, HEIGHT = 600;
-GLfloat cursorPositionX = 0;
-GLfloat cursorPositionY = 0;
+GLfloat mousePositionX = 0;
+GLfloat mousePositionY = 0;
+GLfloat mouseScrollOffsetX = 0;
+GLfloat mouseScrollOffsetY = -30;
 
 void error_callback( int error, const char* description )
 {
@@ -31,10 +33,17 @@ static void key_callback( GLFWwindow* window, int key, int scancode, int action,
 }
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
-	cursorPositionX = xpos;
-	cursorPositionY = ypos;
+	mousePositionX = xpos;
+	mousePositionY = ypos;
 	//printf( "%f %f\n", xpos, ypos );
 }
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+	mouseScrollOffsetX += xoffset;
+	mouseScrollOffsetY += yoffset;
+	printf( "%d\n", (int)mouseScrollOffsetY );
+}
+
 
 void fps() {
 	static GLuint frames = 0;
@@ -77,6 +86,7 @@ int main() {
 
 	glfwSetKeyCallback( window, key_callback );
 	glfwSetCursorPosCallback(window, cursor_position_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 
 	glewExperimental = GL_TRUE;
 	if( glewInit() != GLEW_OK ) {
@@ -97,15 +107,29 @@ int main() {
 
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
-    GLfloat vertices[] = {
-         1.0f,  1.0f, 0.0f,  1.0f, 1.0f,
-         1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
-        -1.0f,  1.0f, 0.0f,  0.0f, 1.0f
-    };
+	GLfloat vertices[] = {
+		-1.0f, -1.0f, -1.0f,  0.0f, 0.0f,
+		-1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
+		-1.0f,  1.0f, -1.0f,  0.0f, 1.0f,
+		-1.0f,  1.0f,  1.0f,  0.0f, 1.0f,
+		 1.0f, -1.0f, -1.0f,  1.0f, 0.0f,
+		 1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
+		 1.0f,  1.0f, -1.0f,  1.0f, 1.0f,
+		 1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
+	};
     GLuint indices[] = {
-        0, 1, 3, // First Triangle
-        1, 2, 3  // Second Triangle
+		0, 1, 2,
+		1, 2, 3,
+		1, 3, 5,
+		3, 5, 7,
+		4, 5, 7,
+		4, 6, 7,
+		0, 4, 6,
+		0, 2, 6,
+		2, 3, 7,
+		2, 6, 7,
+		0, 1, 5,
+		0, 4, 5
     };
 	// vertex buffer object (VBO)
 	// vertex array object (VAO)
@@ -200,9 +224,9 @@ int main() {
 		glm::mat4 model;
 		glm::mat4 view;
 		glm::mat4 projection;
-		model = glm::rotate( model, glm::radians(cursorPositionX - WIDTH/2), glm::vec3(0.0f, 1.0f, 0.0f) );
-		model = glm::rotate( model, glm::radians(cursorPositionY - HEIGHT/2), glm::vec3(1.0f, 0.0f, 0.0f) );
-		view = glm::translate( view, glm::vec3( 0.0f, 0.0f, -3.0f ) );
+		model = glm::rotate( model, glm::radians(mousePositionX - WIDTH/2), glm::vec3(0.0f, 1.0f, 0.0f) );
+		model = glm::rotate( model, glm::radians(mousePositionY - HEIGHT/2), glm::vec3(1.0f, 0.0f, 0.0f) );
+		view = glm::translate( view, glm::vec3( 0.0f, 0.0f, mouseScrollOffsetY/10.0f ) );
 		projection = glm::perspective( 45.0f, (GLfloat)WIDTH/HEIGHT, 0.1f, 100.0f );
 		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "model" ), 1, GL_FALSE, glm::value_ptr(model) );
 		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "view" ), 1, GL_FALSE, glm::value_ptr(view) );
@@ -211,7 +235,7 @@ int main() {
 
 		glBindVertexArray( VAO );
 		//glDrawArrays( GL_TRIANGLES, 0, 3 );
-		glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+		glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0 );
 		glBindVertexArray( 0 );
 
 		glfwSwapBuffers( window );

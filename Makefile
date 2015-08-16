@@ -1,4 +1,4 @@
-target = 
+target = texture.cpp
 GLEW = -lGLEW -lGLU -lGL
 GLFW = -lglfw
 INCLUDE = -I/usr/include

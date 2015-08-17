@@ -14,10 +14,15 @@
 #include "shader.hpp"
 
 const GLuint WIDTH = 800, HEIGHT = 600;
-GLfloat mousePositionX = 0;
-GLfloat mousePositionY = 0;
-GLfloat mouseScrollOffsetX = 0;
-GLfloat mouseScrollOffsetY = -30;
+GLfloat aspectRatio = WIDTH / HEIGHT;
+GLfloat mouseSensitivityRatio = aspectRatio;
+GLfloat mouseSensitivity = 0.1f;
+glm::vec2 mousePosition(0.0f, 0.0f);
+glm::vec2 mouseScrollOffset( 0.0f, -30.0f );
+glm::vec3 cameraPosition(0.0f, 0.0f, 0.0f);
+glm::vec3 cameraOrientation(0.0f, 0.0f, 0.0f);
+GLboolean keyboardKeys[1024] = {GL_FALSE};
+GLboolean keyboardScancodes[1024] = {GL_FALSE};
 
 void error_callback( int error, const char* description )
 {
@@ -25,23 +30,38 @@ void error_callback( int error, const char* description )
 	//fputs( description, stderr );
 }
 
-static void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods )
-{
-	if ( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS ) {
-		glfwSetWindowShouldClose( window, GL_TRUE );
+static void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods ) {
+	if( key > 1023 ) {
+		fprintf( stderr, "key input %d too large", key );
+		key = 1023;
+	}
+	if( scancode > 1023 ) {
+		fprintf( stderr, "scancode input %d too large", scancode );
+		scancode = 1023;
+	}
+	if( action == GLFW_PRESS ) {
+		keyboardKeys[key] = GL_TRUE;
+		keyboardScancodes[scancode] = GL_TRUE;
+		if( key == GLFW_KEY_ESCAPE ) {
+			glfwSetWindowShouldClose( window, GL_TRUE );
+		}
+	} else if( action == GLFW_RELEASE ) {
+		keyboardKeys[key] = GL_FALSE;
+		keyboardScancodes[scancode] = GL_FALSE;
 	}
 }
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
-	mousePositionX = xpos;
-	mousePositionY = ypos;
+	cameraOrientation[0] += (xpos - mousePosition[0]) * mouseSensitivity * mouseSensitivityRatio;
+	cameraOrientation[1] += (ypos - mousePosition[1]) * mouseSensitivity * mouseSensitivityRatio;
+	mousePosition[0] = xpos;
+	mousePosition[1] = ypos;
+	//printf( "%f %f\n", cameraOrientation[0], cameraOrientation[1] );
 	//printf( "%f %f\n", xpos, ypos );
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-	mouseScrollOffsetX += xoffset;
-	mouseScrollOffsetY += yoffset;
-	printf( "%d\n", (int)mouseScrollOffsetY );
+	//printf( "%d\n", (int)mouseScrollOffset[1] );
 }
 
 
@@ -57,6 +77,26 @@ void fps() {
 		frames = 0;
 	}
 	++frames;
+}
+void updateCamera() {
+	if( keyboardKeys[GLFW_KEY_W] ) {
+		cameraPosition[1] -= 0.02f;
+	}
+	if( keyboardKeys[GLFW_KEY_S] ) {
+		cameraPosition[1] += 0.02f;
+	}
+	if( keyboardKeys[GLFW_KEY_A] ) {
+		cameraPosition[0] += 0.02f;
+	}
+	if( keyboardKeys[GLFW_KEY_D] ) {
+		cameraPosition[0] -= 0.02f;
+	}
+	if( keyboardKeys[GLFW_KEY_Q] ) {
+		cameraPosition[2] += 0.02f;
+	}
+	if( keyboardKeys[GLFW_KEY_E] ) {
+		cameraPosition[2] -= 0.02f;
+	}
 }
 
 int main() {
@@ -87,6 +127,7 @@ int main() {
 	glfwSetKeyCallback( window, key_callback );
 	glfwSetCursorPosCallback(window, cursor_position_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glewExperimental = GL_TRUE;
 	if( glewInit() != GLEW_OK ) {
@@ -208,9 +249,11 @@ int main() {
 
 	// Game loop
 	while( !glfwWindowShouldClose( window ) ) {
+	//for( int iter = 1; iter; --iter ) {
+		glfwPollEvents();
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-		glfwPollEvents();
+		updateCamera();
 
 		glActiveTexture( GL_TEXTURE0 );
 		glBindTexture(GL_TEXTURE_2D, texture);
@@ -223,22 +266,36 @@ int main() {
 		glUseProgram( shader.Program );
 
 
-		glm::mat4 model;
+		glm::mat4 models[2];
 		glm::mat4 view;
 		glm::mat4 projection;
-		model = glm::rotate( model, glm::radians(mousePositionX - WIDTH/2), glm::vec3(0.0f, 1.0f, 0.0f) );
-		model = glm::rotate( model, glm::radians(mousePositionY - HEIGHT/2), glm::vec3(1.0f, 0.0f, 0.0f) );
-		view = glm::translate( view, glm::vec3( 0.0f, 0.0f, mouseScrollOffsetY/10.0f ) );
+		//view = glm::translate( view, cameraPosition );
+		/*
+		for( int y = 0; y < 4; ++y ) {
+			for( int x = 0; x < 4; ++x ) {
+				printf( "%f ", projection[x][y] );
+			}
+			printf("\n");
+		}
+		*/
+		
+		models[0] = glm::translate( models[0], glm::vec3( 4.0f, 4.0f, -10.0f ) );
+		models[1] = glm::translate( models[1], glm::vec3( -4.0f, -4.0f, -10.0f ) );
+
 		projection = glm::perspective( 45.0f, (GLfloat)WIDTH/HEIGHT, 0.1f, 100.0f );
-		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "model" ), 1, GL_FALSE, glm::value_ptr(model) );
+		projection = glm::rotate( projection, glm::radians(cameraOrientation[1]), glm::vec3(1.0f, 0.0f, 0.0f) );
+		projection = glm::rotate( projection, glm::radians(cameraOrientation[0]), glm::vec3(0.0f, 1.0f, 0.0f) );
+		projection = glm::translate( projection, cameraPosition );
 		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "view" ), 1, GL_FALSE, glm::value_ptr(view) );
 		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "projection" ), 1, GL_FALSE, glm::value_ptr(projection) );
 
-
-		glBindVertexArray( VAO );
-		//glDrawArrays( GL_TRIANGLES, 0, 3 );
-		glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0 );
-		glBindVertexArray( 0 );
+		for( int numBoxes = 0; numBoxes < 3; ++numBoxes ) {
+			glUniformMatrix4fv( glGetUniformLocation(shader.Program, "model" ), 1, GL_FALSE, glm::value_ptr(models[numBoxes]) );
+			glBindVertexArray( VAO );
+			//glDrawArrays( GL_TRIANGLES, 0, 3 );
+			glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0 );
+			glBindVertexArray( 0 );
+		}
 
 		glfwSwapBuffers( window );
 		fps();

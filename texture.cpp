@@ -84,14 +84,14 @@ void fps() {
 }
 void updateCamera() {
 	if( keyboardKeys[GLFW_KEY_W] ) {
-		//view = glm::translate( view, 0.01f * glm::vec3(1.0f, 0.0f, 0.0f) );
+		view = glm::translate( view, glm::vec3(0.0f, 0.0f, 0.1f));
 		//cameraPosition[1] -= 0.02f;
 		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[0] * 0.01f, glm::vec3(1.0f, 0.0f, 0.0f) );
 		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[1] * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f) );
 		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[2] * 0.01f, glm::vec3(0.0f, 0.0f, 1.0f) );
-		//cameraPosition = glm::translate( cameraPosition, glm::vec3(0.01f, 0.0f, 0.0f));
 	}
 	if( keyboardKeys[GLFW_KEY_S] ) {
+		view = glm::translate( view, glm::vec3(0.0f, 0.0f, -0.1f));
 		//view = glm::translate( view, -0.01f * glm::vec3(1.0f, 0.0f, 0.0f) );
 		//cameraPosition[1] += 0.02f;
 		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[0] * 0.01f, glm::vec3(1.0f, 0.0f, 0.0f) );
@@ -100,17 +100,21 @@ void updateCamera() {
 		//cameraPosition = glm::translate( cameraPosition, glm::vec3(0.0f, 0.0f, 0.0f));
 	}
 	if( keyboardKeys[GLFW_KEY_A] ) {
+		view = glm::translate( view, glm::vec3(0.1f, 0.0f, 0.0f));
 		//cameraPosition[0] += 0.02f;
 		//cameraPosition = glm::translate( cameraPosition, cameraOrientation * -0.01f );
 	}
 	if( keyboardKeys[GLFW_KEY_D] ) {
+		view = glm::translate( view, glm::vec3(-0.1f, 0.0f, 0.0f));
 		//cameraPosition[0] -= 0.02f;
 		//cameraPosition = glm::translate( cameraPosition, cameraOrientation * 0.01f );
 	}
 	if( keyboardKeys[GLFW_KEY_Q] ) {
+		view = glm::translate( view, glm::vec3(0.0f, 0.1f, 0.0f));
 		//cameraPosition[2] += 0.02f;
 	}
 	if( keyboardKeys[GLFW_KEY_E] ) {
+		view = glm::translate( view, glm::vec3(0.0f, -0.1f, 0.0f));
 		//cameraPosition[2] -= 0.02f;
 	}
 }
@@ -298,7 +302,7 @@ int main() {
 		models[0] = glm::translate( models[0], glm::vec3( 4.0f, 4.0f, -10.0f ) );
 		models[1] = glm::translate( models[1], glm::vec3( -4.0f, -4.0f, -10.0f ) );
 
-		glm::mat4 rotatedView = camera[0] * camera[1] * view;
+		glm::mat4 rotatedView = camera[1] * camera[0] * view;
 		
 		//projection = glm::rotate( projection, glm::radians(cameraOrientation[1]), glm::vec3(1.0f, 0.0f, 0.0f) );
 		//projection = glm::rotate( projection, glm::radians(cameraOrientation[0]), glm::vec3(0.0f, 1.0f, 0.0f) );

@@ -80,16 +80,20 @@ void fps() {
 }
 void updateCamera() {
 	if( keyboardKeys[GLFW_KEY_W] ) {
-		cameraPosition[1] -= 0.02f;
+		//cameraPosition[1] -= 0.02f;
+		cameraPosition += cameraOrientation * 0.01f;
 	}
 	if( keyboardKeys[GLFW_KEY_S] ) {
-		cameraPosition[1] += 0.02f;
+		//cameraPosition[1] += 0.02f;
+		cameraPosition -= cameraOrientation * 0.01f;
 	}
 	if( keyboardKeys[GLFW_KEY_A] ) {
-		cameraPosition[0] += 0.02f;
+		//cameraPosition[0] += 0.02f;
+		cameraPosition += cameraOrientation * 0.01f;
 	}
 	if( keyboardKeys[GLFW_KEY_D] ) {
-		cameraPosition[0] -= 0.02f;
+		//cameraPosition[0] -= 0.02f;
+		cameraPosition -= cameraOrientation * 0.01f;
 	}
 	if( keyboardKeys[GLFW_KEY_Q] ) {
 		cameraPosition[2] += 0.02f;

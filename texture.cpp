@@ -83,6 +83,7 @@ void fps() {
 	++frames;
 }
 void updateCamera() {
+	glm::mat4 rotatedView = camera[1] * camera[0] * view;
 	if( keyboardKeys[GLFW_KEY_W] ) {
 		view = glm::translate( view, glm::vec3(0.0f, 0.0f, 0.1f));
 		//cameraPosition[1] -= 0.02f;
@@ -117,6 +118,7 @@ void updateCamera() {
 		view = glm::translate( view, glm::vec3(0.0f, -0.1f, 0.0f));
 		//cameraPosition[2] -= 0.02f;
 	}
+	view = camera[1] / camera[0] / rotatedView;
 }
 
 int main() {

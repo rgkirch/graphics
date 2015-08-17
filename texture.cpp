@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <stdio.h>
 
@@ -16,13 +17,14 @@
 const GLuint WIDTH = 800, HEIGHT = 600;
 GLfloat aspectRatio = WIDTH / HEIGHT;
 GLfloat mouseSensitivityRatio = aspectRatio;
-GLfloat mouseSensitivity = 0.1f;
+GLfloat mouseSensitivity = 0.05f;
 glm::vec2 mousePosition(0.0f, 0.0f);
 glm::vec2 mouseScrollOffset( 0.0f, -30.0f );
-glm::vec3 cameraPosition(0.0f, 0.0f, 0.0f);
-glm::vec3 cameraOrientation(0.0f, 0.0f, 0.0f);
+glm::quat cameraOrientation;
+glm::mat4 camera[2];
 GLboolean keyboardKeys[1024] = {GL_FALSE};
 GLboolean keyboardScancodes[1024] = {GL_FALSE};
+glm::mat4 view;
 
 void error_callback( int error, const char* description )
 {
@@ -52,10 +54,12 @@ static void key_callback( GLFWwindow* window, int key, int scancode, int action,
 }
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
-	cameraOrientation[0] += (xpos - mousePosition[0]) * mouseSensitivity * mouseSensitivityRatio;
-	cameraOrientation[1] += (ypos - mousePosition[1]) * mouseSensitivity * mouseSensitivityRatio;
-	mousePosition[0] = xpos;
-	mousePosition[1] = ypos;
+	//cameraOrientation = glm::rotate( cameraOrientation, (GLfloat)((xpos - mousePosition.x) * mouseSensitivity * mouseSensitivityRatio), glm::vec3(0.0f, 1.0f, 0.0f) );
+	//cameraOrientation = glm::rotate( cameraOrientation, (GLfloat)((ypos - mousePosition.y) * mouseSensitivity * mouseSensitivityRatio), glm::vec3(1.0f, 0.0f, 0.0f) );
+	camera[0] = glm::rotate( camera[0], glm::radians((GLfloat)((xpos - mousePosition.x) * mouseSensitivity * mouseSensitivityRatio)), glm::vec3(0.0f, 1.0f, 0.0f) );
+	camera[1] = glm::rotate( camera[1], glm::radians((GLfloat)((ypos - mousePosition.y) * mouseSensitivity * mouseSensitivityRatio)), glm::vec3(1.0f, 0.0f, 0.0f) );
+	mousePosition.x = xpos;
+	mousePosition.y = ypos;
 	//printf( "%f %f\n", cameraOrientation[0], cameraOrientation[1] );
 	//printf( "%f %f\n", xpos, ypos );
 }
@@ -80,26 +84,34 @@ void fps() {
 }
 void updateCamera() {
 	if( keyboardKeys[GLFW_KEY_W] ) {
+		//view = glm::translate( view, 0.01f * glm::vec3(1.0f, 0.0f, 0.0f) );
 		//cameraPosition[1] -= 0.02f;
-		cameraPosition += cameraOrientation * 0.01f;
+		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[0] * 0.01f, glm::vec3(1.0f, 0.0f, 0.0f) );
+		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[1] * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f) );
+		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[2] * 0.01f, glm::vec3(0.0f, 0.0f, 1.0f) );
+		//cameraPosition = glm::translate( cameraPosition, glm::vec3(0.01f, 0.0f, 0.0f));
 	}
 	if( keyboardKeys[GLFW_KEY_S] ) {
+		//view = glm::translate( view, -0.01f * glm::vec3(1.0f, 0.0f, 0.0f) );
 		//cameraPosition[1] += 0.02f;
-		cameraPosition -= cameraOrientation * 0.01f;
+		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[0] * 0.01f, glm::vec3(1.0f, 0.0f, 0.0f) );
+		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[1] * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f) );
+		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[2] * 0.01f, glm::vec3(0.0f, 0.0f, 1.0f) );
+		//cameraPosition = glm::translate( cameraPosition, glm::vec3(0.0f, 0.0f, 0.0f));
 	}
 	if( keyboardKeys[GLFW_KEY_A] ) {
 		//cameraPosition[0] += 0.02f;
-		cameraPosition += cameraOrientation * 0.01f;
+		//cameraPosition = glm::translate( cameraPosition, cameraOrientation * -0.01f );
 	}
 	if( keyboardKeys[GLFW_KEY_D] ) {
 		//cameraPosition[0] -= 0.02f;
-		cameraPosition -= cameraOrientation * 0.01f;
+		//cameraPosition = glm::translate( cameraPosition, cameraOrientation * 0.01f );
 	}
 	if( keyboardKeys[GLFW_KEY_Q] ) {
-		cameraPosition[2] += 0.02f;
+		//cameraPosition[2] += 0.02f;
 	}
 	if( keyboardKeys[GLFW_KEY_E] ) {
-		cameraPosition[2] -= 0.02f;
+		//cameraPosition[2] -= 0.02f;
 	}
 }
 
@@ -249,6 +261,8 @@ int main() {
 
 
 
+	glm::mat4 projection;
+	projection = glm::perspective( 45.0f, (GLfloat)WIDTH/HEIGHT, 0.1f, 100.0f );
 
 
 	// Game loop
@@ -271,8 +285,6 @@ int main() {
 
 
 		glm::mat4 models[2];
-		glm::mat4 view;
-		glm::mat4 projection;
 		//view = glm::translate( view, cameraPosition );
 		/*
 		for( int y = 0; y < 4; ++y ) {
@@ -286,11 +298,12 @@ int main() {
 		models[0] = glm::translate( models[0], glm::vec3( 4.0f, 4.0f, -10.0f ) );
 		models[1] = glm::translate( models[1], glm::vec3( -4.0f, -4.0f, -10.0f ) );
 
-		projection = glm::perspective( 45.0f, (GLfloat)WIDTH/HEIGHT, 0.1f, 100.0f );
-		projection = glm::rotate( projection, glm::radians(cameraOrientation[1]), glm::vec3(1.0f, 0.0f, 0.0f) );
-		projection = glm::rotate( projection, glm::radians(cameraOrientation[0]), glm::vec3(0.0f, 1.0f, 0.0f) );
-		projection = glm::translate( projection, cameraPosition );
-		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "view" ), 1, GL_FALSE, glm::value_ptr(view) );
+		glm::mat4 rotatedView = camera[0] * camera[1] * view;
+		
+		//projection = glm::rotate( projection, glm::radians(cameraOrientation[1]), glm::vec3(1.0f, 0.0f, 0.0f) );
+		//projection = glm::rotate( projection, glm::radians(cameraOrientation[0]), glm::vec3(0.0f, 1.0f, 0.0f) );
+		//projection = projection * (cameraPosition / 10.0f);
+		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "view" ), 1, GL_FALSE, glm::value_ptr(rotatedView) );
 		glUniformMatrix4fv( glGetUniformLocation(shader.Program, "projection" ), 1, GL_FALSE, glm::value_ptr(projection) );
 
 		for( int numBoxes = 0; numBoxes < 3; ++numBoxes ) {

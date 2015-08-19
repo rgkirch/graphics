@@ -11,10 +11,14 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <stdio.h>
+#include <math.h>
 
 #include "shader.hpp"
 
-const GLuint WIDTH = 800, HEIGHT = 600;
+#define PI 3.1415926
+
+const GLuint WIDTH = 1920/2, HEIGHT = 1080/2;
+GLFWwindow* window;
 GLfloat aspectRatio = WIDTH / HEIGHT;
 GLfloat mouseSensitivityRatio = aspectRatio;
 GLfloat mouseSensitivity = 0.05f;
@@ -24,10 +28,12 @@ glm::quat cameraOrientation;
 glm::mat4 camera[2];
 GLboolean keyboardKeys[1024] = {GL_FALSE};
 GLboolean keyboardScancodes[1024] = {GL_FALSE};
+glm::vec3 position(0.0f, 0.0f, 0.0f);
+glm::vec3 direction(0.0f, 0.0f, 0.0f);
+glm::vec3 rotation(0.0f, 0.0f, 0.0f);
 glm::mat4 view;
 
-void error_callback( int error, const char* description )
-{
+void error_callback( int error, const char* description ) {
 	fprintf( stderr, "%s", description );
 	//fputs( description, stderr );
 }
@@ -53,16 +59,27 @@ static void key_callback( GLFWwindow* window, int key, int scancode, int action,
 	}
 }
 
+GLfloat normalizeCursorMovement( GLfloat movement, GLfloat range ) {
+	return (movement - floor(movement/range)*range)/range;
+}
+
+/*
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	//cameraOrientation = glm::rotate( cameraOrientation, (GLfloat)((xpos - mousePosition.x) * mouseSensitivity * mouseSensitivityRatio), glm::vec3(0.0f, 1.0f, 0.0f) );
 	//cameraOrientation = glm::rotate( cameraOrientation, (GLfloat)((ypos - mousePosition.y) * mouseSensitivity * mouseSensitivityRatio), glm::vec3(1.0f, 0.0f, 0.0f) );
 	camera[0] = glm::rotate( camera[0], glm::radians((GLfloat)((xpos - mousePosition.x) * mouseSensitivity * mouseSensitivityRatio)), glm::vec3(0.0f, 1.0f, 0.0f) );
 	camera[1] = glm::rotate( camera[1], glm::radians((GLfloat)((ypos - mousePosition.y) * mouseSensitivity * mouseSensitivityRatio)), glm::vec3(1.0f, 0.0f, 0.0f) );
+	direction.x += sin( (GLfloat)((mousePosition.x) * mouseSensitivity * mouseSensitivityRatio) );
+	direction.z += cos( (GLfloat)((mousePosition.x) * mouseSensitivity * mouseSensitivityRatio) );
+	//direction.x += cos( glm::radians((GLfloat)((ypos - mousePosition.y) * mouseSensitivity * mouseSensitivityRatio)) );
+	direction = glm::normalize( direction );
 	mousePosition.x = xpos;
 	mousePosition.y = ypos;
 	//printf( "%f %f\n", cameraOrientation[0], cameraOrientation[1] );
 	//printf( "%f %f\n", xpos, ypos );
 }
+*/
+
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 	//printf( "%d\n", (int)mouseScrollOffset[1] );
@@ -77,22 +94,47 @@ void fps() {
 	}
 	if( glfwGetTime() > fpsTimeout ) {
 		fpsTimeout = glfwGetTime() + 1.0f;
-		printf( "%d fps\n", frames);
+		//printf( "%d fps\n", frames);
 		frames = 0;
 	}
 	++frames;
 }
 void updateCamera() {
-	glm::mat4 rotatedView = camera[1] * camera[0] * view;
+	// TODO handle overflow, can use glfwSetCursorPos
+	double xpos, ypos;
+	xpos = ypos = 0;
+	glfwGetCursorPos( window, &xpos, &ypos );
+	//GLfloat xdelta = xpos - mousePosition.x;
+	//GLfloat ydelta = ypos - mousePosition.y;
+	//mousePosition.x = xpos;
+	//mousePosition.y = ypos;
+	GLfloat temp;
+	temp = normalizeCursorMovement( xpos, WIDTH * 4 ) * 2 * PI;
+	rotation.y = temp;
+	direction.x = sin( temp );
+	direction.z = -cos( temp );
+	temp = normalizeCursorMovement( ypos, WIDTH * 4 ) * 2 * PI;
+	rotation.x = temp;
+	//rotation.z = temp;
+	//printf("temp %f, sin %f\n", temp, sin( temp ));
+	printf( "direction x %f, y %f, z %f\n", direction.x, direction.y, direction.z );
+	
+	//glm::mat4 rotatedView = camera[1] * camera[0] * view;
+	glm::mat4 tempMat;
 	if( keyboardKeys[GLFW_KEY_W] ) {
-		view = glm::translate( view, glm::vec3(0.0f, 0.0f, 0.1f));
+		//position += direction * 0.1f;
+		view = glm::translate( view, -1.0f * direction);
 		//cameraPosition[1] -= 0.02f;
 		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[0] * 0.01f, glm::vec3(1.0f, 0.0f, 0.0f) );
 		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[1] * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f) );
 		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[2] * 0.01f, glm::vec3(0.0f, 0.0f, 1.0f) );
 	}
 	if( keyboardKeys[GLFW_KEY_S] ) {
-		view = glm::translate( view, glm::vec3(0.0f, 0.0f, -0.1f));
+		//position -= direction * 0.1f;
+		view = glm::translate( view, direction);
+		//tempMat = glm::translate( tempMat, direction);
+		//view *= tempMat;
+		//view = glm::translate( view, glm::vec3(0.0f, 0.0f, -0.1f));
 		//view = glm::translate( view, -0.01f * glm::vec3(1.0f, 0.0f, 0.0f) );
 		//cameraPosition[1] += 0.02f;
 		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[0] * 0.01f, glm::vec3(1.0f, 0.0f, 0.0f) );
@@ -101,29 +143,28 @@ void updateCamera() {
 		//cameraPosition = glm::translate( cameraPosition, glm::vec3(0.0f, 0.0f, 0.0f));
 	}
 	if( keyboardKeys[GLFW_KEY_A] ) {
-		view = glm::translate( view, glm::vec3(0.1f, 0.0f, 0.0f));
+		//view = glm::translate( view, glm::vec3(0.1f, 0.0f, 0.0f));
 		//cameraPosition[0] += 0.02f;
 		//cameraPosition = glm::translate( cameraPosition, cameraOrientation * -0.01f );
 	}
 	if( keyboardKeys[GLFW_KEY_D] ) {
-		view = glm::translate( view, glm::vec3(-0.1f, 0.0f, 0.0f));
+		//view = glm::translate( view, glm::vec3(-0.1f, 0.0f, 0.0f));
 		//cameraPosition[0] -= 0.02f;
 		//cameraPosition = glm::translate( cameraPosition, cameraOrientation * 0.01f );
 	}
 	if( keyboardKeys[GLFW_KEY_Q] ) {
-		view = glm::translate( view, glm::vec3(0.0f, 0.1f, 0.0f));
+		//view = glm::translate( view, glm::vec3(0.0f, 0.1f, 0.0f));
 		//cameraPosition[2] += 0.02f;
 	}
 	if( keyboardKeys[GLFW_KEY_E] ) {
-		view = glm::translate( view, glm::vec3(0.0f, -0.1f, 0.0f));
+		//view = glm::translate( view, glm::vec3(0.0f, -0.1f, 0.0f));
 		//cameraPosition[2] -= 0.02f;
 	}
-	view = camera[1] / camera[0] / rotatedView;
+	//view = camera[1] / camera[0] / rotatedView;
 }
 
 int main() {
 	// INIT
-	GLFWwindow* window;
 
 	glfwSetErrorCallback( error_callback );
 
@@ -147,9 +188,11 @@ int main() {
 	glfwMakeContextCurrent( window );
 
 	glfwSetKeyCallback( window, key_callback );
-	glfwSetCursorPosCallback(window, cursor_position_callback);
+	//glfwSetCursorPosCallback(window, cursor_position_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	int count;
+	//printf( "%s\n", glfwGetVideoModes( glfwGetPrimaryMonitor(), &count ) );
 
 	glewExperimental = GL_TRUE;
 	if( glewInit() != GLEW_OK ) {
@@ -270,6 +313,14 @@ int main() {
 	glm::mat4 projection;
 	projection = glm::perspective( 45.0f, (GLfloat)WIDTH/HEIGHT, 0.1f, 100.0f );
 
+	/*
+	for( int y = 0; y < 4; ++y ) {
+		for( int x = 0; x < 4; ++x ) {
+			printf( "%f ", test[x][y] );
+		}
+		printf("\n");
+	}
+	*/
 
 	// Game loop
 	while( !glfwWindowShouldClose( window ) ) {
@@ -277,7 +328,6 @@ int main() {
 		glfwPollEvents();
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-		updateCamera();
 
 		glActiveTexture( GL_TEXTURE0 );
 		glBindTexture(GL_TEXTURE_2D, texture);
@@ -291,20 +341,22 @@ int main() {
 
 
 		glm::mat4 models[2];
-		//view = glm::translate( view, cameraPosition );
-		/*
-		for( int y = 0; y < 4; ++y ) {
-			for( int x = 0; x < 4; ++x ) {
-				printf( "%f ", projection[x][y] );
-			}
-			printf("\n");
-		}
-		*/
+		
 		
 		models[0] = glm::translate( models[0], glm::vec3( 4.0f, 4.0f, -10.0f ) );
-		models[1] = glm::translate( models[1], glm::vec3( -4.0f, -4.0f, -10.0f ) );
+		//models[1] = glm::translate( models[1], glm::vec3( -4.0f, -4.0f, -10.0f ) );
+		models[1] = glm::scale( models[1], glm::vec3( 50.0f, 50.0f, 50.0f ) );
 
-		glm::mat4 rotatedView = camera[1] * camera[0] * view;
+		updateCamera();
+		//glm::mat4 rotatedView = camera[1] * camera[0] * view;
+		printf( "rotation x %f, y %f, z %f\n", rotation.x, rotation.y, rotation.z );
+		glm::mat4 rotatedView;
+		rotatedView = glm::rotate( rotatedView, rotation.x, glm::vec3(1, 0, 0) ) ;
+		rotatedView = glm::rotate( rotatedView, rotation.y, glm::vec3(0, 1, 0) ) ;
+		rotatedView = glm::rotate( rotatedView, rotation.z, glm::vec3(0, 0, 1) ) ;
+		rotatedView *= view;
+		//view = glm::translate( view, position );
+		//glm::mat4 rotatedView;
 		
 		//projection = glm::rotate( projection, glm::radians(cameraOrientation[1]), glm::vec3(1.0f, 0.0f, 0.0f) );
 		//projection = glm::rotate( projection, glm::radians(cameraOrientation[0]), glm::vec3(0.0f, 1.0f, 0.0f) );
@@ -322,6 +374,7 @@ int main() {
 
 		glfwSwapBuffers( window );
 		fps();
+		printf("\n");
 	}
 
 	glDeleteVertexArrays( 1, &VAO );

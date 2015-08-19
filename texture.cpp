@@ -115,52 +115,24 @@ void updateCamera() {
 	direction.z = -cos( temp );
 	temp = normalizeCursorMovement( ypos, WIDTH * 4 ) * 2 * PI;
 	rotation.x = temp;
-	//rotation.z = temp;
-	//printf("temp %f, sin %f\n", temp, sin( temp ));
 	printf( "direction x %f, y %f, z %f\n", direction.x, direction.y, direction.z );
 	
-	//glm::mat4 rotatedView = camera[1] * camera[0] * view;
 	glm::mat4 tempMat;
 	if( keyboardKeys[GLFW_KEY_W] ) {
-		//position += direction * 0.1f;
 		view = glm::translate( view, -1.0f * direction);
-		//cameraPosition[1] -= 0.02f;
-		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[0] * 0.01f, glm::vec3(1.0f, 0.0f, 0.0f) );
-		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[1] * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f) );
-		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[2] * 0.01f, glm::vec3(0.0f, 0.0f, 1.0f) );
 	}
 	if( keyboardKeys[GLFW_KEY_S] ) {
-		//position -= direction * 0.1f;
 		view = glm::translate( view, direction);
-		//tempMat = glm::translate( tempMat, direction);
-		//view *= tempMat;
-		//view = glm::translate( view, glm::vec3(0.0f, 0.0f, -0.1f));
-		//view = glm::translate( view, -0.01f * glm::vec3(1.0f, 0.0f, 0.0f) );
-		//cameraPosition[1] += 0.02f;
-		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[0] * 0.01f, glm::vec3(1.0f, 0.0f, 0.0f) );
-		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[1] * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f) );
-		//cameraPosition = glm::rotate( cameraPosition, cameraOrientation[2] * 0.01f, glm::vec3(0.0f, 0.0f, 1.0f) );
-		//cameraPosition = glm::translate( cameraPosition, glm::vec3(0.0f, 0.0f, 0.0f));
 	}
 	if( keyboardKeys[GLFW_KEY_A] ) {
-		//view = glm::translate( view, glm::vec3(0.1f, 0.0f, 0.0f));
-		//cameraPosition[0] += 0.02f;
-		//cameraPosition = glm::translate( cameraPosition, cameraOrientation * -0.01f );
+		view = glm::translate( view, glm::vec3( direction.x, direction.y, direction.z) );
 	}
 	if( keyboardKeys[GLFW_KEY_D] ) {
-		//view = glm::translate( view, glm::vec3(-0.1f, 0.0f, 0.0f));
-		//cameraPosition[0] -= 0.02f;
-		//cameraPosition = glm::translate( cameraPosition, cameraOrientation * 0.01f );
 	}
 	if( keyboardKeys[GLFW_KEY_Q] ) {
-		//view = glm::translate( view, glm::vec3(0.0f, 0.1f, 0.0f));
-		//cameraPosition[2] += 0.02f;
 	}
 	if( keyboardKeys[GLFW_KEY_E] ) {
-		//view = glm::translate( view, glm::vec3(0.0f, -0.1f, 0.0f));
-		//cameraPosition[2] -= 0.02f;
 	}
-	//view = camera[1] / camera[0] / rotatedView;
 }
 
 int main() {

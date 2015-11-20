@@ -30,3 +30,4 @@
 *.swp
 stb/
 *.swo
+*.pyc

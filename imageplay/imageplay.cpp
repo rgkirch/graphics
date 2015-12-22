@@ -23,6 +23,7 @@ using namespace std;
 GLchar* readFile(char* fileName);
 GLuint createShader(char* vertexShaderFileName, char* fragmentShaderFileName);
 void printShaderLog(char* errorMessageWithoutNewline, GLuint shaderProgram);
+int checkShaderStepSuccess(GLint shaderProgramID, GLint statusToCheck);
 
 int main(int argc, char** argv) {
     if(argc < 3) {
@@ -220,27 +221,43 @@ GLchar* readFile(char* fileName) {
 GLuint createShader(char* vertexShaderFileName, char* fragmentShaderFileName) {
     if( ! vertexShaderFileName ) fprintf(stderr, "error: NULL passed in for vertex shader file name.\n");
     if( ! fragmentShaderFileName ) fprintf(stderr, "error: NULL passed in for fragment shader file name.\n");
-    GLchar* vertexShaderCode = readFile(vertexShaderFileName);
-    GLchar* fragmentShaderCode = readFile(fragmentShaderFileName);
-    GLuint shaderProgram = glCreateProgram();
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource( vertexShader, 1, &vertexShaderCode, NULL );
-    glShaderSource( fragmentShader, 1, &fragmentShaderCode, NULL );
-    free(vertexShaderCode);
-    free(fragmentShaderCode);
-    //delete [] vertexShaderCode;
-    //delete [] fragmentShaderCode;
-    glCompileShader(shaderProgram);
-    GLint compileSuccess = 0;
-    glGetShaderiv( shaderProgram, GL_COMPILE_STATUS, &compileSuccess );
-    if( ! compileSuccess ) printShaderLog((char*)"error: gl shader program failed to compile.", shaderProgram);
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    GLint linkSucces = 0;
-    glGetProgramiv( shaderProgram, GL_LINK_STATUS, &linkSucces );
-    if( ! linkSucces ) printShaderLog((char*)"error: gl shader program failed to link.", shaderProgram);
+    char* code[] = { vertexShaderFileName, fragmentShaderFileName };
+    GLint shaders[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
+    GLuint program = glCreateProgram();
+    for(int i = 0; i < 2; ++i) {
+        GLchar* shaderCode = readFile( code[i] );
+        GLuint shader = glCreateShader( shaders[i] );
+        glShaderSource( shader, 1, &code[i], NULL );
+        free( code[i] );
+        //delete [] code[i];
+        glCompileShader(shader);
+        checkShaderStepSuccess(shader, GL_COMPILE_STATUS);
+        glAttachShader(program, shader);
+        glDeleteShader(shader);
+    }
+    glLinkProgram(program);
+    checkShaderStepSuccess(program, GL_LINK_STATUS);
+    return program;
+}
+
+int checkShaderStepSuccess(GLint program, GLint status) {
+    GLint success = 0;
+    glGetShaderiv( program, status, &success );
+    char* errorMessage = NULL;
+    if( ! success ) {
+        switch(status) {
+            case GL_COMPILE_STATUS:
+                errorMessage = (char*)"error: gl shader program failed to compile.";
+                break;
+            case GL_LINK_STATUS:
+                errorMessage = (char*)"error: gl shader program failed to link.";
+                break;
+            default:
+                errorMessage = (char*)"error";
+                break;
+        }
+        printShaderLog(errorMessage, program);
+    }
 }
 
 void printShaderLog(char* errorMessage, GLuint shader) {

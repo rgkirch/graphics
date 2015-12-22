@@ -69,14 +69,6 @@ int main(int argc, char** argv) {
 
     GLuint shaderProgram = createShader(argv[1], argv[2]);
 
-    ShaderInfo shaders[] = {
-        { GL_VERTEX_SHADER, vertexShaderCode },
-        { GL_FRAGMENT_SHADER, fragmentShaderCode },
-        { GL_NONE, NULL }
-    };
-    //GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    //glShaderSource(vertexShader, 1, &((GLchar*)vertexShaderString.c_str()), NULL);
-
 	GLfloat vertices[] = {
 		-1.0f, -1.0f,  0.0f,
 		-1.0f,  1.0f,  0.0f,
@@ -102,17 +94,10 @@ int main(int argc, char** argv) {
 
 		// void glVertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer);
 		// the 0 for index comes from location = 0 in the vertex shader
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0 );
-		glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)) );
+        GLint shaderVerticies = glGetUniformLocation(shaderProgram, "position");
+		glVertexAttribPointer( shaderVerticies, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
 		glEnableVertexAttribArray( 0 );
-		glEnableVertexAttribArray( 1 );
 	glBindVertexArray( 0 );
-
-
-
-
-
-
 
 
 	stbi_set_flip_vertically_on_load(1);
@@ -129,47 +114,15 @@ int main(int argc, char** argv) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // Load, create texture and generate mipmaps
     int width, height, comp;
-    unsigned char* image = stbi_load("./images/container.jpg", &width, &height, &comp, 3);
+    unsigned char* image = stbi_load("./container.jpg", &width, &height, &comp, 3);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(image);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-
-    GLuint texture1;
-    glGenTextures(1, &texture1);
-	//printf( "texture1: %d\n", texture1 );
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    // Set our texture parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // Set texture filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // Load, create texture and generate mipmaps
-    image = stbi_load("./images/awesomeface.png", &width, &height, &comp, 3 );
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(image);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-
-
-
-
-
+    GLint shaderTextureLocation = glGetUniformLocation(shaderProgram, "texture");
+    glBindTexture(GL_TEXTURE_2D, shaderTextureLocation);
 
 	glm::mat4 projection;
 	projection = glm::perspective( 45.0f, (GLfloat)WIDTH/HEIGHT, 0.1f, 100.0f );
-
-	/*
-	for( int y = 0; y < 4; ++y ) {
-		for( int x = 0; x < 4; ++x ) {
-			printf( "%f ", test[x][y] );
-		}
-		printf("\n");
-	}
-	*/
 
 	// Game loop
 	while( !glfwWindowShouldClose( window ) ) {

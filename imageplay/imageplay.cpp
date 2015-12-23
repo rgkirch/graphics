@@ -68,35 +68,42 @@ int main(int argc, char** argv) {
 	glEnable( GL_DEPTH_TEST );
 
     GLuint shaderProgram = createShader(argv[1], argv[2]);
+    glUseProgram(shaderProgram);
 
-	GLfloat vertices[] = {
-		-1.0f, -1.0f,  0.0f,
-		-1.0f,  1.0f,  0.0f,
-		 1.0f,  1.0f,  0.0f,
-		 1.0f, -1.0f,  0.0f
-	};
-    GLuint indices[] = {
+    const GLfloat vertex_positions[] =
+    {
+        -1.0f, -1.0f, 0.0f, 1.0f,
+         1.0f, -1.0f, 0.0f, 1.0f,
+         1.0f,  1.0f, 0.0f, 1.0f,
+        -1.0f,  1.0f, 0.0f, 1.0f
+    };
+    const GLfloat vertex_colors[] =
+    {
+        1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 1.0f,
+        0.0f, 1.0f, 1.0f, 1.0f
+    };
+    const GLuint vertex_indices[] = {
 		0, 1, 2,
 		0, 2, 3,
     };
-	// vertex buffer object (VBO)
-	// vertex array object (VAO)
-	GLuint VAO, VBO, EBO;
-	glGenVertexArrays( 1, &VAO );
-	glGenBuffers( 1, &VBO );
+    GLuint EBO;
 	glGenBuffers( 1, &EBO );
-	// BIND the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(vertex_indices), vertex_indices, GL_STATIC_DRAW );
+    GLuint VBO;
+	glGenBuffers( 1, &VBO );
+    glBindBuffer( GL_ARRAY_BUFFER, VBO );
+    glBufferData( GL_ARRAY_BUFFER, sizeof(vertex_positions), vertex_positions, GL_STATIC_DRAW );
+	GLuint VAO;
+	glGenVertexArrays( 1, &VAO );
 	glBindVertexArray( VAO );
-		glBindBuffer( GL_ARRAY_BUFFER, VBO );
-		glBufferData( GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW );
-
-		// void glVertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer);
-		// the 0 for index comes from location = 0 in the vertex shader
+        // void glVertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer);
+        // the 0 for index comes from location = 0 in the vertex shader
         GLint shaderVerticies = glGetUniformLocation(shaderProgram, "position");
-		glVertexAttribPointer( shaderVerticies, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
-		glEnableVertexAttribArray( 0 );
+        glVertexAttribPointer( shaderVerticies, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
+    glEnableVertexAttribArray( 0 );
 	glBindVertexArray( 0 );
 
 
@@ -177,6 +184,7 @@ GLuint createShader(char* vertexShaderFileName, char* fragmentShaderFileName) {
     char* code[] = { vertexShaderFileName, fragmentShaderFileName };
     GLint shaders[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
     GLuint program = glCreateProgram();
+    if( ! program ) fprintf(stderr, "error: failed to create program\n");
     for(int i = 0; i < 2; ++i) {
         GLchar* shaderCode = readFile( code[i] );
         GLuint shader = glCreateShader( shaders[i] );
@@ -186,7 +194,7 @@ GLuint createShader(char* vertexShaderFileName, char* fragmentShaderFileName) {
         glCompileShader(shader);
         checkShaderStepSuccess(shader, GL_COMPILE_STATUS);
         glAttachShader(program, shader);
-        glDeleteShader(shader);
+        //glDeleteShader(shader); //TODO uncomment this line
     }
     glLinkProgram(program);
     checkShaderStepSuccess(program, GL_LINK_STATUS);

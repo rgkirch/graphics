@@ -28,22 +28,6 @@ void printShaderLog(char* errorMessageWithoutNewline, GLuint shaderProgram);
 void checkShaderStepSuccess(GLint shaderProgramID, GLuint statusToCheck);
 
 int main(int argc, char** argv) {
-    if('\0' == EOF) {
-        printf("equal\n");
-    } else {
-        printf("not equal\n");
-    }
-    const char* vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec3 position;\n"
-        "void main() {\n"
-            "gl_Position = vec4( position, 1.0 );\n"
-        "}\n";
-    const char* fragmentShaderSource = "#version 330 core\n"
-        "out vec4 color;\n"
-        "void main() {\n"
-            "color = vec4(0.1f, 0.2f, 0.5f, 1.0f);\n"
-        "}\n";
-
     if(argc < 3) {
         fprintf(stderr, "You have to run the program with at least two arguments.\n");
         fprintf(stderr, "./a.out vertexShaderFileName fragmentShaderFileName\n");
@@ -81,72 +65,24 @@ int main(int argc, char** argv) {
 	glViewport( 0, 0, WIDTH, HEIGHT );
 
 	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-	//glEnable( GL_DEPTH_TEST );
+	glEnable( GL_DEPTH_TEST );
 
     GLuint shaderProgram = createShader(argv[1], argv[2]);
-    ShaderInfo shaders[] = {
-        { GL_VERTEX_SHADER, "./vertexShader.glsl" },
-        { GL_FRAGMENT_SHADER, "./fragmentShader.glsl" },
-        { GL_NONE, NULL }
-    };
-    //GLuint shaderProgram = LoadShaders(shaders);
-    
-
-    /*
-	// VERTEX SHADER
-	GLuint vertexShader = glCreateShader( GL_VERTEX_SHADER );
-	// void glShaderSource(	GLuint shader, GLsizei count, const GLchar **string, const GLint *length);
-	glShaderSource( vertexShader, 1, &vertexShaderSource, NULL );
-	glCompileShader( vertexShader );
-	// Check for compile time errors
-	GLint success;
-	GLchar infoLog[512];
-	glGetShaderiv( vertexShader, GL_COMPILE_STATUS, &success );
-	if ( !success ) {
-		glGetShaderInfoLog( vertexShader, 512, NULL, infoLog );
-		printf( "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog );
-	}
-	// FRAGMENT SHADER
-	GLuint fragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
-	glShaderSource( fragmentShader, 1, &fragmentShaderSource, NULL );
-	glCompileShader( fragmentShader );
-	// Check for compile time errors
-	glGetShaderiv( fragmentShader, GL_COMPILE_STATUS, &success );
-	if ( !success ) {
-		glGetShaderInfoLog( fragmentShader, 512, NULL, infoLog );
-		printf( "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog );
-	}
-	// Link shaders
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader( shaderProgram, vertexShader );
-	glAttachShader( shaderProgram, fragmentShader );
-	glLinkProgram( shaderProgram );
-	// Check for linking errors
-	glGetProgramiv( shaderProgram, GL_LINK_STATUS, &success );
-	if ( !success ) {
-		glGetProgramInfoLog( shaderProgram, 512, NULL, infoLog );
-		printf( "ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog );
-	}
-	glDeleteShader( vertexShader );
-	glDeleteShader( fragmentShader );
-    */
-
-    
     glUseProgram(shaderProgram);
 
     const GLfloat vertex_positions[] =
     {
-        -1.0f, -1.0f, 0.2f,
-         1.0f,  0.0f, 0.2f,
-         0.0f,  1.0f, 0.2f
+        -1.0f, -1.0f, 0.0f,
+         1.0f,  0.0f, 0.0f,
+         0.0f,  1.0f, 0.0f
     };
-	GLuint VAO;
-	glGenVertexArrays( 1, &VAO );
-	glBindVertexArray( VAO );
     GLuint VBO;
 	glGenBuffers( 1, &VBO );
     glBindBuffer( GL_ARRAY_BUFFER, VBO );
     glBufferData( GL_ARRAY_BUFFER, sizeof(vertex_positions), vertex_positions, GL_STATIC_DRAW );
+	GLuint VAO;
+	glGenVertexArrays( 1, &VAO );
+	glBindVertexArray( VAO );
     //GLint shaderVerticies = glGetUniformLocation(shaderProgram, "position");
     GLint shaderVerticies = 0;
     //printf("shader position location %d\n", shaderVerticies);
@@ -159,14 +95,14 @@ int main(int argc, char** argv) {
 
 	while( !glfwWindowShouldClose( window ) ) {
 		glfwPollEvents();
-		glClear( GL_COLOR_BUFFER_BIT );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         glBindVertexArray( VAO );
         glDrawArrays( GL_TRIANGLES, 0, 3 );
         glBindVertexArray( 0 );
 
 		glfwSwapBuffers( window );
-        //glFlush();
+        glFlush();
 	}
 
 	glDeleteVertexArrays( 1, &VAO );
@@ -187,7 +123,7 @@ GLchar* readFile(char* fileName) {
     rewind(file);
     GLchar* contents = (GLchar*)malloc(fileLength + 1);
     if( ! contents ) fprintf(stderr, "error: Could not allocate memory.\n");
-    contents[fileLength] = EOF;
+    contents[fileLength] = '\0';
     fread(contents, 1, fileLength, file);
     fclose(file);
     return contents;
@@ -196,21 +132,21 @@ GLchar* readFile(char* fileName) {
 GLuint createShader(char* vertexShaderFileName, char* fragmentShaderFileName) {
     if( ! vertexShaderFileName ) fprintf(stderr, "error: NULL passed in for vertex shader file name.\n");
     if( ! fragmentShaderFileName ) fprintf(stderr, "error: NULL passed in for fragment shader file name.\n");
-    char* code[] = { vertexShaderFileName, fragmentShaderFileName };
-    GLint shaders[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
+    char* sourceFileName[] = { vertexShaderFileName, fragmentShaderFileName };
+    GLint shaderEnums[] = { GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
     GLuint program = glCreateProgram();
     if( ! program ) fprintf(stderr, "error: failed to create program\n");
     printf("program id %u\n", program);
     for(int i = 0; i < 2; ++i) {
-        const GLchar* shaderCode = readFile( code[i] );
-        GLuint shader = glCreateShader( shaders[i] );
+        const GLchar* shaderCode = readFile( sourceFileName[i] );
+        GLuint shader = glCreateShader( shaderEnums[i] );
         glShaderSource( shader, 1, &shaderCode, NULL );
         glCompileShader(shader);
         checkShaderStepSuccess(shader, GL_COMPILE_STATUS);
         glAttachShader(program, shader);
         //free( shaderCode );
         delete [] shaderCode;
-        //glDeleteShader(shader); //TODO uncomment this line
+        glDeleteShader(shader);
     }
     glLinkProgram(program);
     checkShaderStepSuccess(program, GL_LINK_STATUS);
@@ -218,22 +154,21 @@ GLuint createShader(char* vertexShaderFileName, char* fragmentShaderFileName) {
 }
 
 void checkShaderStepSuccess(GLint program, GLuint status) {
-    GLint success = 0;
-    glGetShaderiv( program, status, &success );
-    char* errorMessage = NULL;
-    if( ! success ) {
-        switch(status) {
-            case GL_COMPILE_STATUS:
-                errorMessage = (char*)"error: gl shader program failed to compile.";
-                break;
-            case GL_LINK_STATUS:
-                errorMessage = (char*)"error: gl shader program failed to link.";
-                break;
-            default:
-                errorMessage = (char*)"error";
-                break;
-        }
-        printShaderLog(errorMessage, program);
+    GLint success = -3;
+    switch(status) {
+        case GL_COMPILE_STATUS:
+            glGetShaderiv( program, status, &success );
+            if( success == -3 ) fprintf(stderr, "error: the success check may have a false positive\n");
+            if( ! success ) printShaderLog((char*)"error: gl shader program failed to compile.", program);
+            break;
+        case GL_LINK_STATUS:
+            glGetProgramiv( program, status, &success );
+            if( success == -3 ) fprintf(stderr, "error: the success check may have a false positive\n");
+            if( ! success ) printShaderLog((char*)"error: gl shader program failed to link.", program);
+            break;
+        default:
+            fprintf(stderr, "function called with unhandled case.\n");
+            break;
     }
 }
 

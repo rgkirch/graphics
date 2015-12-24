@@ -5,6 +5,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/quaternion.hpp>
+
+#include <math.h>
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -110,16 +117,23 @@ int main(int argc, char** argv) {
 
     glClearColor( 0.6f, 0.8f, 0.8f, 1.0f );
 
+    /*
+	glm::mat4 projection;
+	projection = glm::perspective( 45.0f, (GLfloat)WIDTH/HEIGHT, 0.1f, 100.0f );
+    glUniformMatrix4fv( glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection) );
+    */
+
 	while( !glfwWindowShouldClose( window ) ) {
 		glfwPollEvents();
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        glBindVertexArray( VAO );
-        //glDrawArrays( GL_TRIANGLES, 0, 3 );
+        //glBindVertexArray( VAO );
         glEnable(GL_PRIMITIVE_RESTART);
         glPrimitiveRestartIndex(0xFFFF);
         glDrawElements(GL_TRIANGLE_STRIP, 17, GL_UNSIGNED_SHORT, NULL);
-        //glBindVertexArray( 0 );
+        //glDrawArrays(GL_TRIANGLES,0, 3);
+        //glDrawElements(GL_TRIANGLE_STRIP, 8, GL_FLOAT, NULL);
+        //glDrawElements(GL_TRIANGLE_STRIP, 8, GL_FLOAT, (const GLvoid *)(9 * sizeof(GLfloat)));
 
         glFlush();
 		glfwSwapBuffers( window );

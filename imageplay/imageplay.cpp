@@ -18,8 +18,6 @@
 #include <sstream>
 #include <iostream>
 
-#include "LoadShaders.h"
-
 using namespace std;
 
 GLchar* readFile(char* fileName);
@@ -83,11 +81,9 @@ int main(int argc, char** argv) {
 	GLuint VAO;
 	glGenVertexArrays( 1, &VAO );
 	glBindVertexArray( VAO );
-    //GLint shaderVerticies = glGetUniformLocation(shaderProgram, "position");
-    GLint shaderVerticies = 0;
-    //printf("shader position location %d\n", shaderVerticies);
-    glEnableVertexAttribArray( shaderVerticies );
-    glVertexAttribPointer( shaderVerticies, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
+    int shaderVertexPositionLayoutLocation = 0;
+    glEnableVertexAttribArray( shaderVertexPositionLayoutLocation );
+    glVertexAttribPointer( shaderVertexPositionLayoutLocation, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0 );
 	glBindVertexArray( 0 );
 
 
@@ -99,10 +95,10 @@ int main(int argc, char** argv) {
 
         glBindVertexArray( VAO );
         glDrawArrays( GL_TRIANGLES, 0, 3 );
-        glBindVertexArray( 0 );
+        //glBindVertexArray( 0 );
 
-		glfwSwapBuffers( window );
         glFlush();
+		glfwSwapBuffers( window );
 	}
 
 	glDeleteVertexArrays( 1, &VAO );
@@ -176,11 +172,9 @@ void printShaderLog(char* errorMessage, GLuint shader) {
     fprintf(stderr, "%s\n", errorMessage);
     GLint length;
     glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &length );
-    fprintf(stderr, "log length %d\n", length);
     GLchar* logText = (GLchar*)malloc(sizeof(GLchar) * (length + 1));
     logText[length] = '\0';
     glGetShaderInfoLog(shader, length, &length, logText);
-    fprintf(stderr, "length after? %d\n", length);
     cout << logText << endl;
     free(logText);
 }

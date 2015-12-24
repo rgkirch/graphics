@@ -66,82 +66,33 @@ int main(int argc, char** argv) {
     GLuint shaderProgram = createShader(argv[1], argv[2]);
     glUseProgram(shaderProgram);
 
-    static const GLfloat cube_positions[] =
-    {
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f,  1.0f
+    GLfloat wtfoats[] = {
+        -1.0f, -1.0f,  0.0f,
+         1.0f, -1.0f,  0.0f,
+         0.0f,  1.0f,  0.0f
     };
-    static const GLfloat cube_colors[] =
-    {
-        1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 0.0f,
-        1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 1.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f
-    };
-    static const GLushort cube_indices[] =
-    {
-        0, 1, 2, 3, 6, 7, 4, 5,
-        0xFFFF, // try !0
-        2, 6, 0, 4, 1, 5, 3, 7
-    };
-    GLuint VBO;
-	glGenBuffers( 1, &VBO );
-    glBindBuffer( GL_ARRAY_BUFFER, VBO );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(cube_positions) + sizeof(cube_colors), NULL, GL_STATIC_DRAW );
-    glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(cube_positions), cube_positions );
-    glBufferSubData( GL_ARRAY_BUFFER, sizeof(cube_positions), sizeof(cube_colors), cube_colors);
-    GLuint EBO;
-    glGenBuffers( 1, &EBO );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_indices), cube_indices, GL_STATIC_DRAW );
-	GLuint VAO;
-	glGenVertexArrays( 1, &VAO );
-	glBindVertexArray( VAO );
-    int shaderLayoutPosition = 0;
-    int shaderLayoutColor = 1;
-    glVertexAttribPointer( shaderLayoutPosition, 3, GL_FLOAT, GL_FALSE, 0, NULL );
-    glVertexAttribPointer( shaderLayoutColor, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)sizeof(cube_positions) );
-    glEnableVertexAttribArray( shaderLayoutPosition );
-    glEnableVertexAttribArray( shaderLayoutColor );
-	//glBindVertexArray( 0 );
+    GLuint wtfbuffer;
+    glGenBuffers(1, &wtfbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, wtfbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(wtfoats), wtfoats, GL_STATIC_DRAW);
+    GLuint wtfva;
+    glGenVertexArrays(1, &wtfva);
+    glBindVertexArray(wtfva);
+    glEnableVertexAttribArray( 0 );
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
     glClearColor( 0.6f, 0.8f, 0.8f, 1.0f );
-
-    /*
-	glm::mat4 projection;
-	projection = glm::perspective( 45.0f, (GLfloat)WIDTH/HEIGHT, 0.1f, 100.0f );
-    glUniformMatrix4fv( glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection) );
-    */
 
 	while( !glfwWindowShouldClose( window ) ) {
 		glfwPollEvents();
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        //glBindVertexArray( VAO );
-        glEnable(GL_PRIMITIVE_RESTART);
-        glPrimitiveRestartIndex(0xFFFF);
-        glDrawElements(GL_TRIANGLE_STRIP, 17, GL_UNSIGNED_SHORT, NULL);
-        //glDrawArrays(GL_TRIANGLES,0, 3);
-        //glDrawElements(GL_TRIANGLE_STRIP, 8, GL_FLOAT, NULL);
-        //glDrawElements(GL_TRIANGLE_STRIP, 8, GL_FLOAT, (const GLvoid *)(9 * sizeof(GLfloat)));
+        glBindVertexArray(wtfva);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glFlush();
+        //glFlush();
 		glfwSwapBuffers( window );
 	}
-
-	glDeleteVertexArrays( 1, &VAO );
-	glDeleteBuffers( 1, &VBO );
-	glDeleteBuffers( 1, &EBO );
 
 	glfwDestroyWindow( window );
 	glfwTerminate();

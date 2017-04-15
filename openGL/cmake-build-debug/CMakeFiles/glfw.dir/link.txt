@@ -1,0 +1,1 @@
+/usr/bin/c++    -lglfw -lGLEW -lGLU -lGL -g   CMakeFiles/glfw.dir/texture.cpp.o  -o glfw 

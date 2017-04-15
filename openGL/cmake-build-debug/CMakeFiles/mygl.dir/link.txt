@@ -1,0 +1,1 @@
+/usr/bin/c++    -lglfw -lGLEW -lGLU -lGL -g   CMakeFiles/mygl.dir/texture.cpp.o  -o mygl 

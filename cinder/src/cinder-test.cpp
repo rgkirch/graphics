@@ -7,13 +7,11 @@ using namespace ci::app;
 
 class BasicApp : public App {
 public:
-    void draw() override;
+    void draw() override {
+        gl::clear();
+        gl::drawSolidCircle( getWindowCenter(), 200 );
+    }
 };
-
-void BasicApp::draw()
-{
-    gl::clear();
-}
 
 CINDER_APP( BasicApp, RendererGl )
 

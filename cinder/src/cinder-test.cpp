@@ -14,13 +14,17 @@ public:
     void draw() override {
         gl::clear();
         auto center = getWindowCenter();
-        auto r = 100.f;
-        gl::color(red);
-        gl::drawSolidCircle( center + vec2{-r, r}, r );
-        gl::color(green);
-        gl::drawSolidCircle( center + vec2{r, r}, r );
-        gl::color(blue);
-        gl::drawSolidCircle( center + vec2{0, -.73 * r}, r );
+        auto r = 70;
+        gl::setMatricesWindow( getWindowSize() );
+        gl::translate( getWindowCenter().x, 75 );
+        gl::color( red );
+        gl::drawSolidCircle( vec2{0}, r );
+        gl::translate( 0, 150 );
+        gl::color( green );
+        gl::drawSolidCircle( vec2{0}, r );
+        gl::translate( 0, 150 );
+        gl::color( blue );
+        gl::drawSolidCircle( vec2{0}, r );
     }
 };
 

@@ -44,7 +44,7 @@ public:
             gl::pushModelMatrix();
             gl::translate( offset );
             gl::color( Color( CM_HSV, rel, 1, 1 ) );
-            gl::drawSphere( vec3(), 0.1f, 30 );
+            gl::drawCube( vec3{}, vec3{0.1f});
             gl::popModelMatrix();
         }
     }

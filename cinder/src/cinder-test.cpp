@@ -1,4 +1,5 @@
 #include <chrono>
+#include "cinder/Easing.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -11,8 +12,10 @@ public:
     void setup() override;
     void draw() override;
 
-    CameraPersp		mCam;
-    gl::BatchRef	mShapes[3][3];
+    static const int NUM_SLICES = 12;
+
+    CameraPersp     mCam;
+    gl::BatchRef    mSlices[NUM_SLICES];
 };
 
 void BasicApp::setup()
@@ -20,26 +23,18 @@ void BasicApp::setup()
     auto lambert = gl::ShaderDef().lambert().color();
     gl::GlslProgRef	shader = gl::getStockShader( lambert );
 
-    auto capsule = geom::Capsule().subdivisionsAxis( 10 ).subdivisionsHeight( 10 );
-    mShapes[0][0] = gl::Batch::create( capsule, shader );
-    auto sphere = geom::Sphere().subdivisions( 30 );
-    mShapes[0][1] = gl::Batch::create( sphere, shader );
-    auto cylinder = geom::Cylinder().subdivisionsAxis( 40 ).subdivisionsHeight( 2 );
-    mShapes[0][2] = gl::Batch::create( cylinder, shader );
-    auto cube = geom::Cube();
-    mShapes[1][0] = gl::Batch::create( cube, shader );
-    auto cone = geom::Cone();
-    mShapes[1][1] = gl::Batch::create( cone, shader );
-    auto torus = geom::Torus();
-    mShapes[1][2] = gl::Batch::create( torus, shader );
-    auto helix = geom::Helix().subdivisionsAxis( 20 ).subdivisionsHeight( 10 );
-    mShapes[2][0] = gl::Batch::create( helix, shader );
-    auto icosahedron = geom::Icosahedron();
-    mShapes[2][1] = gl::Batch::create( icosahedron, shader );
-    auto teapot = geom::Teapot() >> geom::Scale( 1.5f );
-    mShapes[2][2] = gl::Batch::create( teapot, shader );
+    for( int i = 0; i < NUM_SLICES; ++i ) {
+        float rel = i / (float)NUM_SLICES;
+        float sliceHeight = 1.0f / NUM_SLICES;
+        auto slice = geom::Cube().size( 1, sliceHeight, 1 );
+        auto trans = geom::Translate( 0, rel, 0 );
+        auto color = geom::Constant( geom::COLOR,
+                                     Color( CM_HSV, rel, 1, 1 ) );
+        mSlices[i] = gl::Batch::create( slice >> trans >> color,
+                                        shader );
+    }
 
-    mCam.lookAt( vec3( 5, 11, 5 ), vec3( 0 ) );
+    mCam.lookAt( vec3( 2, 3, 2 ), vec3( 0, 0.5f, 0 ) );
 }
 
 void BasicApp::draw()
@@ -50,18 +45,34 @@ void BasicApp::draw()
 
     gl::setMatrices( mCam );
 
-    float gridSize = 5;
+    const float delay = 0.25f;
+    // time in seconds for one slice to rotate
+    const float rotationTime = 1.5f;
+    // time in seconds to delay each slice's rotation
+    const float rotationOffset = 0.1f; // seconds
+    // total time for entire animation
+    const float totalTime = delay + rotationTime +
+                            NUM_SLICES * rotationOffset;
 
-    for( int i = 0; i < 3; ++i ) {
-        for( int j = 0; j < 3; ++j ) {
-            float x = ( -0.5f + i / 2.0f ) * gridSize;
-            float z = ( -0.5f + j / 2.0f ) * gridSize;
+    // loop every 'totalTime' seconds
+    float time = fmod( getElapsedFrames() / 30.0f, totalTime );
 
-            gl::ScopedModelMatrix scpModelMatrix;
-            gl::translate( x, 1, z );
-            gl::color( i / 2.0f, 1 - i * j, j / 2.0f );
-            mShapes[i][j]->draw();
-        }
+    for( int i = 0; i < NUM_SLICES; ++i ) {
+        // animates from 0->1
+        float rotation = 0;
+        // when does the slice begin rotating
+        float startTime = i * rotationOffset;
+        // when does it complete
+        float endTime = startTime + rotationTime;
+        // are we in the middle of our time section?
+        if( time > startTime && time < endTime )
+            rotation = ( time - startTime ) / rotationTime;
+        // ease fn on rotation, then convert to radians
+        float angle = easeInOutQuint( rotation ) * M_PI / 2.0f;
+
+        gl::ScopedModelMatrix scpModelMtx;
+        gl::rotate( angleAxis( angle, vec3( 0, 1, 0 ) ) );
+        mSlices[i]->draw();
     }
 }
 

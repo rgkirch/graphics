@@ -18,11 +18,15 @@ public:
 //        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 //        auto turn = ms / 10000.f;
         count++;
-        auto turn = count * M_PI * 2 / 60.f;
+        auto turn = count * M_PI * 2 / (60.f * 4);
         gl::clear();
+        gl::enableDepthRead();
+        gl::enableDepthWrite();
+
         CameraPersp cam;
-        cam.lookAt( vec3( sin(turn), cos(turn), 3 ), vec3( 0 ) );
+        cam.lookAt( vec3( sin(turn) * 5, 2, cos(turn) * 5 ), vec3( 0 ) );
         gl::setMatrices( cam );
+
         auto lambert = gl::ShaderDef().lambert();
         auto shader = gl::getStockShader( lambert );
         shader->bind();

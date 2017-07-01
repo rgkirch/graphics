@@ -14,7 +14,7 @@ public:
     void draw() override {
         gl::clear();
         auto center = getWindowCenter();
-        float r = 100;
+        auto r = 100.f;
         gl::color(red);
         gl::drawSolidCircle( center + vec2{-r, r}, r );
         gl::color(green);

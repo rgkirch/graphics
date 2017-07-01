@@ -1,5 +1,4 @@
 #include <chrono>
-#include "cinder/Easing.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -9,25 +8,40 @@ using namespace ci::app;
 
 class BasicApp : public App {
 public:
-    void    setup() override;
-    void    draw() override;
+    void	setup() override;
+    void	draw() override;
 
     CameraPersp         mCam;
-    gl::BatchRef        mSphere;
-    gl::TextureRef      mTexture;
-    gl::GlslProgRef     mGlsl;
+    gl::BatchRef        mCube;
+    gl::GlslProgRef		mGlsl;
 };
 
 void BasicApp::setup()
 {
-    auto img = loadImage( "/home/richie/Documents/rgkirch/glfw/cinder/lib/Cinder/samples/_opengl/MipMap/resources/checkerboard.png" );
-    mTexture = gl::Texture::create( img );
-    mTexture->bind();
+    mCam.lookAt( vec3( 3, 2, 4 ), vec3( 0 ) );
 
-    auto shader = gl::ShaderDef().texture().lambert();
-    mGlsl = gl::getStockShader( shader );
-    auto sphere = geom::Sphere().subdivisions( 50 );
-    mSphere = gl::Batch::create( sphere, mGlsl );
+    mGlsl = gl::GlslProg::create(
+        gl::GlslProg::Format()
+        .vertex(
+            CI_GLSL( 150,
+                uniform mat4    ciModelViewProjection;
+                in vec4         ciPosition;
+                void main( void ) {
+                    gl_Position = ciModelViewProjection * ciPosition;
+                }
+            )
+        )
+        .fragment(
+            CI_GLSL( 150,
+                out vec4 oColor;
+                void main( void ) {
+                    oColor = vec4( 1, 0.5, 0.25, 1 );
+                }
+            )
+        )
+    );
+
+    mCube = gl::Batch::create( geom::Cube(), mGlsl );
 
     gl::enableDepthWrite();
     gl::enableDepthRead();
@@ -35,19 +49,9 @@ void BasicApp::setup()
 
 void BasicApp::draw()
 {
-    auto x = getElapsedFrames() / (4 * 60.f) * M_PI * 2;
-    mCam.lookAt( vec3( sin(x) * 4, 2, cos(x) * 4 ), vec3( 0 ) );
-
     gl::clear( Color( 0.2f, 0.2f, 0.2f ) );
     gl::setMatrices( mCam );
-
-    mSphere->draw();
-
-    // draw the texture itself in the upper right corner
-    gl::setMatricesWindow( getWindowSize() );
-    Rectf drawRect( 0, 0, mTexture->getWidth() / 3,
-                    mTexture->getHeight() / 3 );
-    gl::draw( mTexture, drawRect );
+    mCube->draw();
 }
 
 CINDER_APP( BasicApp, RendererGl )

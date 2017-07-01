@@ -26,12 +26,12 @@ public:
             auto offset = vec2{ cos(angle), sin(angle) };
             gl::pushModelMatrix();
             gl::translate( offset * radius );
+            gl::rotate( angle );
+            gl::scale( 8, .25f );
             gl::color( Color{CM_HSV, rel, 1, 1} );
-            gl::drawStrokedCircle( vec2{}, 30 );
+            gl::drawSolidCircle( vec2{}, 30 );
             gl::popModelMatrix();
         }
-        gl::color( Color{1,1,1} );
-        gl::drawSolidCircle( vec2{}, 15 );
         gl::popModelMatrix();
     }
 };

@@ -16,23 +16,10 @@ class BasicApp : public App {
 public:
     void draw() override {
         gl::clear();
-        gl::pushModelMatrix();
-        gl::translate( getWindowCenter() );
-        auto numCircles = 16;
-        auto radius = getWindowHeight() / 2.f - 30;
-        for(auto c = 0; c < numCircles; c++) {
-            auto rel = c / (float)numCircles;
-            auto angle = rel * M_PI * 2;
-            auto offset = vec2{ cos(angle), sin(angle) };
-            gl::pushModelMatrix();
-            gl::translate( offset * radius );
-            gl::rotate( angle );
-            gl::scale( 8, .25f );
-            gl::color( Color{CM_HSV, rel, 1, 1} );
-            gl::drawSolidCircle( vec2{}, 30 );
-            gl::popModelMatrix();
-        }
-        gl::popModelMatrix();
+        CameraPersp cam;
+        cam.lookAt( vec3( 3, 3, 3 ), vec3( 0 ) );
+        gl::setMatrices( cam );
+        gl::drawCube( vec3(), vec3( 2 ) );
     }
 };
 

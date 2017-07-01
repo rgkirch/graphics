@@ -21,17 +21,15 @@ public:
 void BasicApp::setup()
 {
     auto lambert = gl::ShaderDef().lambert().color();
-    gl::GlslProgRef	shader = gl::getStockShader( lambert );
+    auto shader = gl::getStockShader( lambert );
 
     for( int i = 0; i < NUM_SLICES; ++i ) {
         float rel = i / (float)NUM_SLICES;
         float sliceHeight = 1.0f / NUM_SLICES;
         auto slice = geom::Cube().size( 1, sliceHeight, 1 );
         auto trans = geom::Translate( 0, rel, 0 );
-        auto color = geom::Constant( geom::COLOR,
-                                     Color( CM_HSV, rel, 1, 1 ) );
-        mSlices[i] = gl::Batch::create( slice >> trans >> color,
-                                        shader );
+        auto color = geom::Constant( geom::COLOR, Color( CM_HSV, rel, 1, 1 ) );
+        mSlices[i] = gl::Batch::create( slice >> trans >> color, shader );
     }
 
     mCam.lookAt( vec3( 2, 3, 2 ), vec3( 0, 0.5f, 0 ) );

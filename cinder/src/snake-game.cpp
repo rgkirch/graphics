@@ -25,15 +25,15 @@ public:
 void BasicApp::setup()
 {
     mShader = gl::getStockShader( gl::ShaderDef().lambert().color() );
-    mCam.lookAt( vec3( 3, 3, 3 ), vec3( 0, 0, 0 ) );
+    mCam.lookAt( vec3( 0, 0, 3 ), vec3( 0, 0, 0 ) );
     mTile.reserve(tilesWide * tilesHigh);
     int i = 0;
     for(auto x = 1.f / (tilesWide + 1); x < 1; x += 1.f / (tilesWide + 1)) {
         for(auto y = 1.f / (tilesHigh + 1); y < 1; y += 1.f / (tilesHigh + 1)) {
             auto c = Color(CM_HSV, i / (float)(tilesWide * tilesHigh), 1, 1 );
             auto color = geom::Constant(geom::COLOR, c);
-            auto trans = geom::Translate( x*2, y*2, 0 );
-            auto scale = geom::Scale(.1f);
+            auto trans = geom::Translate( x, y, 0 );
+            auto scale = geom::Scale(.2f);
             mTile.push_back(gl::Batch::create( geom::Cube() >> scale >> trans >> color, mShader));
             i++;
         }

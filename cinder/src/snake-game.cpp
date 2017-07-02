@@ -25,10 +25,9 @@ public:
 
 void BasicApp::setup()
 {
-    auto lambert = gl::ShaderDef().lambert().color();
-    mShader = gl::getStockShader( lambert );
+    mShader = gl::getStockShader( gl::ShaderDef().lambert().color() );
     mCam.lookAt( vec3( 0, 0, 5 ), vec3( 0, 0, 0 ) );
-    mTile = gl::Batch::create( geom::Cube(), mShader);
+    mTile = gl::Batch::create( geom::Cube() >> geom::Scale( .5f ), mShader);
 }
 
 void BasicApp::draw()
@@ -38,9 +37,16 @@ void BasicApp::draw()
     gl::enableDepthWrite();
 
     gl::setMatrices( mCam );
+    auto tilesWide = 4;
+    auto tilesHigh = 4;
 
     gl::ScopedModelMatrix scpModelMtx;
-    gl::drawCube( vec3{}, vec3{0.1f});
+    for(auto x = 1.f / (tilesWide + 1); x < 1; x++) {
+        for(auto y = 1.f / (tilesHigh + 1); y < 1; y++) {
+            gl::translate( getWindowCenter() - getWindowWidth() );
+            gl::drawCube( vec3{x, y, 0}, vec3{0.1f});
+        }
+    }
 }
 
 CINDER_APP( BasicApp, RendererGl )

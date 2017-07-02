@@ -1,6 +1,5 @@
 #include <chrono>
 #include <vector>
-#include "cinder/Easing.h"
 #include "cinder/Xml.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
@@ -9,47 +8,84 @@
 using namespace ci;
 using namespace ci::app;
 
-class BasicApp : public App {
+class Direction {
+public:
+    bool isUp() { return direction == 1; }
+    bool isRight() { return direction == 2; }
+    bool isDown() { return direction == 3; }
+    bool isLeft() { return direction == 4; }
+    bool setUp() { direction = 1; }
+    bool setRight() { direction = 2; }
+    bool setDown() { direction = 3; }
+    bool setLeft() { direction = 4; }
+private:
+    // 1 up, 2 right, 3 down, 4 left
+    int direction {5};
+};
+
+class SnakeGame : public App {
 public:
     void setup() override;
     void draw() override;
     void resize() override;
     void keyDown( KeyEvent event ) override;
 
-    CameraPersp     mCam;
-    gl::GlslProgRef	mShader;
+    CameraPersp mCam;
+    gl::GlslProgRef mShader;
     std::vector<gl::BatchRef> mTile;
+    std::list<std::pair<int, int>> snake;
+    std::pair<int, int> food;
+    Direction headDir;
     float tileScale;
     int tilesWide;
     int tilesHigh;
 };
 
-void BasicApp::keyDown( KeyEvent event )
+void SnakeGame::keyDown( KeyEvent event )
 {
-    if( event.getCode() == KeyEvent::KEY_SPACE ) {
-        setup();
+    switch( event.getCode() ) {
+        case KeyEvent::KEY_SPACE:
+            setup();
+            break;
+        case KeyEvent::KEY_ESCAPE:
+            quit();
+            break;
+        case KeyEvent::KEY_UP:
+            headDir.isUp();
+            break;
+        case KeyEvent::KEY_DOWN:
+            headDir.isDown();
+            break;
+        case KeyEvent::KEY_LEFT:
+            headDir.isLeft();
+            break;
+        case KeyEvent::KEY_RIGHT:
+            headDir.isRight();
+            break;
     }
 }
 
-void BasicApp::resize()
+void SnakeGame::resize()
 {
     mCam.setAspectRatio( getWindowAspectRatio() );
 }
 
-void BasicApp::setup()
+void SnakeGame::setup()
 {
     XmlTree doc(loadFile( "/home/richie/Documents/rgkirch/glfw/cinder/assets/values.xml" ));
     tilesWide = atoi(doc.getChild("snakeGame/tilesWide").getValue().c_str());
     tilesHigh = atoi(doc.getChild("snakeGame/tilesHigh").getValue().c_str());
     tileScale = atof(doc.getChild("snakeGame/tilesScale").getValue().c_str());
     mShader = gl::getStockShader( gl::ShaderDef().lambert().color() );
+    snake.clear();
     mCam.lookAt( vec3( 0, 0, 3 ), vec3( 0, 0, 0 ) );
     mTile.clear();
     mTile.reserve(tilesWide * tilesHigh);
     int i = 0;
     for(auto x = 1.f / (tilesWide + 1); x < 1; x += 1.f / (tilesWide + 1)) {
         for(auto y = 1.f / (tilesHigh + 1); y < 1; y += 1.f / (tilesHigh + 1)) {
-            auto c = Color(CM_HSV, i / (float)(tilesWide * tilesHigh), 1, 1 );
+//            auto c = Color(CM_HSV, i / (float)(tilesWide * tilesHigh), 1, 1 );
+            auto c = Color( .3f, .3f, .3f );
             auto color = geom::Constant(geom::COLOR, c);
             auto trans = geom::Translate( x * 2 - 1, y * 2 - 1, 0 );
             auto scale = geom::Scale(tileScale);
@@ -57,9 +93,10 @@ void BasicApp::setup()
             i++;
         }
     }
+
 }
 
-void BasicApp::draw() {
+void SnakeGame::draw() {
     gl::clear();
     gl::enableDepthRead();
     gl::enableDepthWrite();
@@ -78,7 +115,7 @@ auto settingsFn = [] ( App::Settings *settings )->void {
     settings->setWindowSize( 400,400 );
 };
 CINDER_APP(
-    BasicApp,
+    SnakeGame,
     RendererGl,
     settingsFn
 )

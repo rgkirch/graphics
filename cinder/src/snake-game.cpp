@@ -24,6 +24,9 @@ public:
 
 void BasicApp::setup()
 {
+    gl::enableDepthRead();
+    gl::enableDepthWrite();
+    
     mShader = gl::getStockShader( gl::ShaderDef().lambert().color() );
     mCam.lookAt( vec3( 0, 0, 5 ), vec3( 0, 0, 0 ) );
     for(auto x = 1.f / (tilesWide + 1); x < 1; x++) {
@@ -36,8 +39,6 @@ void BasicApp::setup()
 void BasicApp::draw()
 {
     gl::clear();
-    gl::enableDepthRead();
-    gl::enableDepthWrite();
 
     gl::setMatrices( mCam );
 

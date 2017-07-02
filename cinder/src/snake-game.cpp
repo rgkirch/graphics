@@ -12,8 +12,7 @@ class BasicApp : public App {
 public:
     void setup() override;
     void draw() override;
-
-    static const int NUM_TILES = 2;
+    void resize() override;
 
     CameraPersp     mCam;
     gl::GlslProgRef	mShader;
@@ -22,8 +21,15 @@ public:
     int tilesHigh = 4;
 };
 
+void BasicApp::resize()
+{
+    mCam.setAspectRatio( getWindowAspectRatio() );
+}
+
 void BasicApp::setup()
 {
+    setWindowSize( vec2{400,400} );
+    setFullScreen( false );
     mShader = gl::getStockShader( gl::ShaderDef().lambert().color() );
     mCam.lookAt( vec3( 0, 0, 3 ), vec3( 0, 0, 0 ) );
     mTile.reserve(tilesWide * tilesHigh);
@@ -33,7 +39,7 @@ void BasicApp::setup()
             auto c = Color(CM_HSV, i / (float)(tilesWide * tilesHigh), 1, 1 );
             auto color = geom::Constant(geom::COLOR, c);
             auto trans = geom::Translate( x, y, 0 );
-            auto scale = geom::Scale(.2f);
+            auto scale = geom::Scale(.1f);
             mTile.push_back(gl::Batch::create( geom::Cube() >> scale >> trans >> color, mShader));
             i++;
         }
@@ -54,6 +60,13 @@ void BasicApp::draw() {
     }
 //    gl::drawCube( vec3{}, vec3{} );
 }
-
-CINDER_APP( BasicApp, RendererGl )
+auto settingsFn = [] ( App::Settings *settings )->void {
+    settings->setFullScreen( false );
+    settings->setWindowSize( 400,400 );
+};
+CINDER_APP(
+    BasicApp,
+    RendererGl,
+    settingsFn
+)
 

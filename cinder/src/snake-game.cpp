@@ -46,32 +46,22 @@ void BasicApp::draw()
     gl::setMatrices( mCam );
 
     const float delay = 0.25f;
-    // time in seconds for one slice to rotate
     const float rotationTime = 1.5f;
-    // time in seconds to delay each slice's rotation
     const float rotationOffset = 0.1f; // seconds
-    // total time for entire animation
     const float totalTime = delay + rotationTime +
                             NUM_TILES * rotationOffset;
 
-    // loop every 'totalTime' seconds
     float time = fmod( getElapsedFrames() / 30.0f, totalTime );
 
     for( int i = 0; i < NUM_TILES; ++i ) {
-        // animates from 0->1
         float rotation = 0;
-        // when does the slice begin rotating
         float startTime = i * rotationOffset;
-        // when does it complete
         float endTime = startTime + rotationTime;
-        // are we in the middle of our time section?
-        if( time > startTime && time < endTime )
-            rotation = ( time - startTime ) / rotationTime;
-        // ease fn on rotation, then convert to radians
+        if( time > startTime && time < endTime ) rotation = ( time - startTime ) / rotationTime;
         float angle = easeInOutQuint( rotation ) * M_PI / 2.0f;
 
         gl::ScopedModelMatrix scpModelMtx;
-        gl::rotate( angleAxis( angle, vec3( 0, 1, 0 ) ) );
+//        gl::rotate( angleAxis( angle, vec3( 0, 1, 0 ) ) );
         mSlices[i]->draw();
     }
 }

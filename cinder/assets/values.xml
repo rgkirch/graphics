@@ -2,4 +2,5 @@
 <snakeGame>
     <tilesWide>8</tilesWide>
     <tilesHigh>8</tilesHigh>
+    <tilesScale>.2</tilesScale>
 </snakeGame>

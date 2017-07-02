@@ -26,27 +26,32 @@ void BasicApp::setup()
 {
     gl::enableDepthRead();
     gl::enableDepthWrite();
-    
+
     mShader = gl::getStockShader( gl::ShaderDef().lambert().color() );
-    mCam.lookAt( vec3( 0, 0, 5 ), vec3( 0, 0, 0 ) );
+    mCam.lookAt( vec3( 5, 5, 5 ), vec3( 0, 0, 0 ) );
+    int i = 0;
     for(auto x = 1.f / (tilesWide + 1); x < 1; x++) {
         for(auto y = 1.f / (tilesHigh + 1); y < 1; y++) {
-            mTile.push_back(gl::Batch::create( geom::Cube() >> geom::Scale(.2f) >> geom::Translate( vec3{x,y,0} ), mShader));
+//            auto color = geom::Constant( geom::COLOR, Color( CM_HSV, i / (float)mTile.size(), 1, 1 ) );
+//            auto trans = geom::Translate( x, y, 0 );
+//            auto scale = geom::Scale(.2f);
+            mTile.push_back(gl::Batch::create( geom::Cube() /*>> trans >> scale >> color*/, mShader));
+            i++;
         }
     }
 }
 
-void BasicApp::draw()
-{
+void BasicApp::draw() {
     gl::clear();
 
-    gl::setMatrices( mCam );
+    gl::setMatrices(mCam);
 
     gl::ScopedModelMatrix scpModelMtx;
-    for(int i = 0; i < mTile.size(); i++) {
-        gl::color( Color( CM_HSV, i / (float)mTile.size(), 1, 1 ) );
+    gl::color(1,1,1);
+    for (int i = 0; i < mTile.size(); i++) {
         mTile[i]->draw();
     }
+    gl::drawCube( vec3{}, vec3{} );
 }
 
 CINDER_APP( BasicApp, RendererGl )

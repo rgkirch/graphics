@@ -1,6 +1,7 @@
 #include <chrono>
 #include <vector>
 #include "cinder/Easing.h"
+#include "cinder/Xml.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -13,13 +14,21 @@ public:
     void setup() override;
     void draw() override;
     void resize() override;
+    void keyDown( KeyEvent event ) override;
 
     CameraPersp     mCam;
     gl::GlslProgRef	mShader;
     std::vector<gl::BatchRef> mTile;
-    int tilesWide = 4;
-    int tilesHigh = 4;
+    int tilesWide;
+    int tilesHigh;
 };
+
+void BasicApp::keyDown( KeyEvent event )
+{
+    if( event.getCode() == KeyEvent::KEY_SPACE ) {
+        setup();
+    }
+}
 
 void BasicApp::resize()
 {
@@ -28,10 +37,13 @@ void BasicApp::resize()
 
 void BasicApp::setup()
 {
-    setWindowSize( vec2{400,400} );
-    setFullScreen( false );
+    XmlTree doc(loadFile( "/home/richie/Documents/rgkirch/glfw/cinder/assets/values.xml" ));
+    tilesWide = atoi(doc.getChild("snakeGame/tilesWide").getValue().c_str());
+    tilesHigh = atoi(doc.getChild("snakeGame/tilesHigh").getValue().c_str());
     mShader = gl::getStockShader( gl::ShaderDef().lambert().color() );
     mCam.lookAt( vec3( 0, 0, 3 ), vec3( 0, 0, 0 ) );
+    mTile.clear();
+    assert(mTile.size() == 0);
     mTile.reserve(tilesWide * tilesHigh);
     int i = 0;
     for(auto x = 1.f / (tilesWide + 1); x < 1; x += 1.f / (tilesWide + 1)) {

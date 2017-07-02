@@ -19,14 +19,16 @@ public:
         {1, -1}
     };
     CameraPersp     mCam;
+    gl::GlslProgRef	mShader;
     gl::BatchRef    mTile;
 };
 
 void BasicApp::setup()
 {
     auto lambert = gl::ShaderDef().lambert().color();
-    gl::GlslProgRef	shader = gl::getStockShader( lambert );
+    mShader = gl::getStockShader( lambert );
     mCam.lookAt( vec3( 0, 0, 5 ), vec3( 0, 0, 0 ) );
+    mTile = gl::Batch::create( geom::Cube(), mShader);
 }
 
 void BasicApp::draw()

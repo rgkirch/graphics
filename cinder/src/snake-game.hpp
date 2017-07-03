@@ -29,8 +29,6 @@ public:
     int tilesWide;
     int tilesHigh;
     SnakeInABox snake;
-//    std::vector< std::function<void()> > pokeForSetup {std::bind(&SnakeInABox::setup, &snake)};
-//    std::vector< std::function<void(KeyEvent)> > pokeForKeyDown {std::bind(&Snake::keyDown, &snake, std::placeholders::_1)};
 };
 
 auto settingsFn = [] ( App::Settings *settings )->void {

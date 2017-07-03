@@ -36,9 +36,9 @@ void SnakeGame::resize()
 void SnakeGame::setup()
 {
     XmlTree doc(loadFile( "/home/richie/Documents/rgkirch/glfw/cinder/assets/values.xml" ));
-    tilesWide = atoi(doc.getChild("snakeGame/tilesWide").getValue().c_str());
-    tilesHigh = atoi(doc.getChild("snakeGame/tilesHigh").getValue().c_str());
-    tileScale = atof(doc.getChild("snakeGame/tilesScale").getValue().c_str());
+    tilesWide = doc.getChild("snakeGame/tilesWide").getValue<int>();
+    tilesHigh = doc.getChild("snakeGame/tilesHigh").getValue<int>();
+    tileScale = doc.getChild("snakeGame/tilesScale").getValue<float>();
     mShader = gl::getStockShader( gl::ShaderDef().lambert().color() );
     mCam.lookAt( vec3( 0, 0, 3 ), vec3( 0, 0, 0 ) );
     mTile.clear();

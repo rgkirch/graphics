@@ -10,7 +10,7 @@
 #include "cinder/app/KeyEvent.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
-//#include "snake-game-helper.hpp"
+#include "snake-game-helper.hpp"
 
 using namespace ci;
 using namespace ci::app;
@@ -21,14 +21,14 @@ public:
     void draw() override;
     void resize() override;
     void keyDown( KeyEvent event ) override;
-
+    void drawSnakeCube(int x, int y);
     CameraPersp mCam;
     gl::GlslProgRef mShader;
     std::vector< gl::BatchRef > mTile;
     float tileScale;
     int tilesWide;
     int tilesHigh;
-//    SnakeInABox snake;
+    SnakeInABox snake;
 //    std::vector< std::function<void()> > pokeForSetup {std::bind(&SnakeInABox::setup, &snake)};
 //    std::vector< std::function<void(KeyEvent)> > pokeForKeyDown {std::bind(&Snake::keyDown, &snake, std::placeholders::_1)};
 };

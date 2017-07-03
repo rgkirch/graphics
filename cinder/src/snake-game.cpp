@@ -10,16 +10,19 @@ void SnakeGame::keyDown(KeyEvent event )
             quit();
             break;
         case KeyEvent::KEY_UP:
-//            snake.up();
+            snake.up();
             break;
         case KeyEvent::KEY_DOWN:
-//            snake.down();
+            snake.down();
             break;
         case KeyEvent::KEY_LEFT:
-//            snake.left();
+            snake.left();
             break;
         case KeyEvent::KEY_RIGHT:
-//            snake.right();
+            snake.right();
+            break;
+        case KeyEvent::KEY_a:
+            snake.step();
             break;
     }
 }
@@ -53,6 +56,18 @@ void SnakeGame::setup()
     }
 }
 
+void SnakeGame::drawSnakeCube(int x, int y) {
+    x+=1;
+    y+=1;
+    gl::BatchRef box;
+    auto c = Color(.2f, .8f, .2f);
+    auto color = geom::Constant(geom::COLOR, c);
+    auto trans = geom::Translate( 1.f / (tilesWide + 1) * x * 2 - 1, 1.f / (tilesHigh + 1) * y * 2 - 1, .2f );
+    auto scale = geom::Scale(tileScale);
+    box = gl::Batch::create( geom::Cube() >> scale >> trans >> color, mShader);
+    box->draw();
+}
+
 void SnakeGame::draw() {
     gl::clear();
     gl::enableDepthRead();
@@ -64,4 +79,7 @@ void SnakeGame::draw() {
     for (int i = 0; i < mTile.size(); i++) {
         mTile[i]->draw();
     }
+//    gl::color(.2f, .8f, .2f);
+//    gl::drawCube( vec3{}, vec3{1} );
+    snake.callOnEach( std::bind(&SnakeGame::drawSnakeCube, &(*this), std::placeholders::_1, std::placeholders::_2) );
 }

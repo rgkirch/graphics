@@ -9,9 +9,18 @@ void SnakeGame::keyDown(KeyEvent event )
         case KeyEvent::KEY_ESCAPE:
             quit();
             break;
-    }
-    for(auto f : pokeForKeyDown) {
-        f(event);
+        case KeyEvent::KEY_UP:
+//            snake.up();
+            break;
+        case KeyEvent::KEY_DOWN:
+//            snake.down();
+            break;
+        case KeyEvent::KEY_LEFT:
+//            snake.left();
+            break;
+        case KeyEvent::KEY_RIGHT:
+//            snake.right();
+            break;
     }
 }
 
@@ -22,9 +31,6 @@ void SnakeGame::resize()
 
 void SnakeGame::setup()
 {
-    for(auto f : pokeForSetup) {
-        f();
-    }
     XmlTree doc(loadFile( "/home/richie/Documents/rgkirch/glfw/cinder/assets/values.xml" ));
     tilesWide = atoi(doc.getChild("snakeGame/tilesWide").getValue().c_str());
     tilesHigh = atoi(doc.getChild("snakeGame/tilesHigh").getValue().c_str());

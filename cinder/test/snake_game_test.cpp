@@ -1,11 +1,9 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "../src/snake-game.hpp"
+#include "../src/snake-game-helper.hpp"
 
 TEST(directionTest, one) {
-    Direction dir;
-    ASSERT_FALSE( dir.isUp() );
-    ASSERT_FALSE( dir.isRight() );
-    ASSERT_FALSE( dir.isLeft() );
-    ASSERT_FALSE( dir.isDown() );
+    SnakeInABox snake(4, 4);
+    snake.up();
+    ASSERT_FALSE( snake.isAlive() );
 }

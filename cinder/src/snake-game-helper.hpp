@@ -26,7 +26,6 @@ private:
     std::pair<int, int> direction;
     void newFood();
     bool isSnakeHere(int x, int y);
-    void die();
 };
 
 bool SnakeInABox::isSnakeHere(int x, int y) {
@@ -50,28 +49,28 @@ void SnakeInABox::step() {
     std::tie(x, y) = snake.front();
     x += direction.first;
     y += direction.second;
-    if(x < boxWidth && x >= 0 && y < boxHeight && y >= 0 && !isSnakeHere(x, y)) {
+    auto end = --std::end(snake);
+    auto begin = std::begin(snake);
+    bool stop = std::find(begin, end, std::make_pair(x,y)) != end;
+    snake.push_front( {x, y} );
+    if(x < boxWidth && x >= 0 && y < boxHeight && y >= 0 && !stop) {
         if(x == food.first && y == food.second) {
             newFood();
         } else {
-            if(snake.empty()) {
-                std::cout << "you fucking idiot" << std::endl;
-            }
             snake.pop_back();
         }
-        snake.push_front( {x, y} );
     } else {
         reset();
     }
 }
 void SnakeInABox::up() {
-    direction = std::make_pair( 0,-1 );
+    direction = std::make_pair( 0,1 );
 }
 void SnakeInABox::right() {
     direction = std::make_pair( 1,0 );
 }
 void SnakeInABox::down() {
-    direction = std::make_pair( 0,1 );
+    direction = std::make_pair( 0,-1 );
 }
 void SnakeInABox::left() {
     direction = std::make_pair( -1,0 );
@@ -84,6 +83,7 @@ SnakeInABox::SnakeInABox(int width, int height) : boxWidth(width), boxHeight(hei
     if(width > 2 && height > 2) {
         snake.push_front( {0,0} );
         direction = std::make_pair( 1, 0 );
+        newFood();
     }
 }
 void SnakeInABox::callOnEach(std::function<void(int, int)> f) {
@@ -95,6 +95,7 @@ void SnakeInABox::reset() {
     snake.clear();
     snake.push_front( {0,0} );
     direction = {1, 0};
+    newFood();
 }
 void SnakeInABox::reset(int width, int height) {
     reset();

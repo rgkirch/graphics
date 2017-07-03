@@ -11,17 +11,18 @@ void SnakeGame::keyDown(KeyEvent event )
             break;
         case KeyEvent::KEY_UP:
             snake.up();
+            snake.step();
             break;
         case KeyEvent::KEY_DOWN:
             snake.down();
+            snake.step();
             break;
         case KeyEvent::KEY_LEFT:
             snake.left();
+            snake.step();
             break;
         case KeyEvent::KEY_RIGHT:
             snake.right();
-            break;
-        case KeyEvent::KEY_a:
             snake.step();
             break;
     }
@@ -82,4 +83,13 @@ void SnakeGame::draw() {
 //    gl::color(.2f, .8f, .2f);
 //    gl::drawCube( vec3{}, vec3{1} );
     snake.callOnEach( std::bind(&SnakeGame::drawSnakeCube, &(*this), std::placeholders::_1, std::placeholders::_2) );
+
+    auto food = snake.getFood();
+    gl::BatchRef foodBox;
+    auto c = Color(.8f, .2f, .2f);
+    auto color = geom::Constant(geom::COLOR, c);
+    auto trans = geom::Translate( 1.f / (tilesWide + 1) * (food.first + 1) * 2 - 1, 1.f / (tilesHigh + 1) * (food.second + 1) * 2 - 1, .2f );
+    auto scale = geom::Scale(tileScale);
+    foodBox = gl::Batch::create( geom::Cube() >> scale >> trans >> color, mShader);
+    foodBox->draw();
 }

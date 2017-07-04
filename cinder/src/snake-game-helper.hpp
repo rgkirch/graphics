@@ -107,7 +107,7 @@ SnakeInABox::SnakeInABox(int width, int height) : boxWidth(width), boxHeight(hei
     if(width > 2 && height > 2) {
         snake.push_front( {0,0} );
         direction = std::make_pair( 1, 0 );
-        newFood();
+        food = newFood(boxWidth, boxHeight, snake);
     }
 }
 void SnakeInABox::callOnEach(std::function<void(int, int)> f) {
@@ -119,7 +119,7 @@ void SnakeInABox::reset() {
     snake.clear();
     snake.push_front( {0,0} );
     direction = {1, 0};
-    newFood();
+    food = newFood(boxWidth, boxHeight, snake);
 }
 void SnakeInABox::reset(int width, int height) {
     reset();

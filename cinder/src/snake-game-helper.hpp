@@ -25,6 +25,7 @@ private:
     std::pair<int, int> food;
     std::pair<int, int> direction;
     void newFood();
+    static std::pair<int, int> newFood(int width, int height, std::list<std::pair<int, int>> snake);
     bool isSnakeHere(int x, int y);
 };
 
@@ -35,6 +36,29 @@ bool SnakeInABox::isSnakeHere(int x, int y) {
         }
     }
     return false;
+}
+std::pair<int, int> SnakeInABox::newFood(int width, int height, std::list<std::pair<int, int>> snake) {
+    assert(snake.size() < width * height);
+    int x,y;
+    std::vector<bool> available;
+    available.resize(width * height, true);
+    for(auto item : snake) {
+        std::tie(x,y) = item;
+        available[y * width + x] = false;
+    }
+    int numberAvailable = width * height - snake.size();
+    int indexOfAvailable = rand() % numberAvailable;
+    for(int i = 0; i < width * height; i++) {
+        if(available[i] == true) {
+            if(indexOfAvailable == 0) {
+                x = i % width;
+                y = i / width;
+                return {x,y};
+            }
+            indexOfAvailable--;
+        }
+    }
+
 }
 void SnakeInABox::newFood() {
     int x, y;
@@ -55,7 +79,7 @@ void SnakeInABox::step() {
     snake.push_front( {x, y} );
     if(x < boxWidth && x >= 0 && y < boxHeight && y >= 0 && !stop) {
         if(x == food.first && y == food.second) {
-            newFood();
+            food = newFood(boxWidth, boxHeight, snake);
         } else {
             snake.pop_back();
         }

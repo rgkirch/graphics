@@ -29,6 +29,8 @@ public:
     int tilesWide;
     int tilesHigh;
     SnakeInABox snake;
+    Font mFont;
+    gl::TextureFontRef mTextureFont;
 };
 
 auto settingsFn = [] ( App::Settings *settings )->void {

@@ -15,8 +15,6 @@ public:
     void right();
     void down();
     void left();
-    void reset();
-    void reset(int width, int height);
     std::pair<int, int> getFood();
     void step();
 private:
@@ -24,7 +22,6 @@ private:
     std::list<std::pair<int, int>> snake;
     std::pair<int, int> food;
     std::pair<int, int> direction;
-    void newFood();
     static std::pair<int, int> newFood(int width, int height, std::list<std::pair<int, int>> snake);
     bool isSnakeHere(int x, int y);
 };
@@ -60,14 +57,6 @@ std::pair<int, int> SnakeInABox::newFood(int width, int height, std::list<std::p
     }
 
 }
-void SnakeInABox::newFood() {
-    int x, y;
-    do {
-        x = rand() % boxWidth;
-        y = rand() % boxWidth;
-    } while(isSnakeHere(x, y));
-    food = {x,y};
-}
 void SnakeInABox::step() {
     int x, y;
     std::tie(x, y) = snake.front();
@@ -84,7 +73,10 @@ void SnakeInABox::step() {
             snake.pop_back();
         }
     } else {
-        reset();
+        snake.clear();
+        snake.push_front( {0,0} );
+        direction = {1, 0};
+        food = newFood(boxWidth, boxHeight, snake);
     }
 }
 void SnakeInABox::up() {
@@ -114,15 +106,4 @@ void SnakeInABox::callOnEach(std::function<void(int, int)> f) {
     for(auto p : snake) {
         f(p.first, p.second);
     }
-}
-void SnakeInABox::reset() {
-    snake.clear();
-    snake.push_front( {0,0} );
-    direction = {1, 0};
-    food = newFood(boxWidth, boxHeight, snake);
-}
-void SnakeInABox::reset(int width, int height) {
-    reset();
-    boxWidth = width;
-    boxHeight = height;
 }

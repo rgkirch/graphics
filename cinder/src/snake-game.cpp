@@ -72,32 +72,35 @@ void SnakeGame::drawSnakeCube(int x, int y) {
 }
 
 void SnakeGame::draw() {
-//    gl::clear();
-//    gl::enableDepthRead();
-//    gl::enableDepthWrite();
-//
-//    gl::setMatrices(mCam);
-//
-//    gl::ScopedModelMatrix scpModelMtx;
-//    for (int i = 0; i < mTile.size(); i++) {
-//        mTile[i]->draw();
-//    }
-////    gl::color(.2f, .8f, .2f);
-////    gl::drawCube( vec3{}, vec3{1} );
-//    snake.callOnEach( std::bind(&SnakeGame::drawSnakeCube, &(*this), std::placeholders::_1, std::placeholders::_2) );
-//
-//    auto food = snake.getFood();
-//    gl::BatchRef foodBox;
-//    auto c = Color(.8f, .2f, .2f);
-//    auto color = geom::Constant(geom::COLOR, c);
-//    auto trans = geom::Translate( 1.f / (tilesWide + 1) * (food.first + 1) * 2 - 1, 1.f / (tilesHigh + 1) * (food.second + 1) * 2 - 1, .2f );
-//    auto scale = geom::Scale(tileScale);
-//    foodBox = gl::Batch::create( geom::Cube() >> scale >> trans >> color, mShader);
-//    foodBox->draw();
+    gl::clear();
+    {
+        gl::enableDepthRead();
+        gl::enableDepthWrite();
+        gl::ScopedModelMatrix scpModelMtx;
+        gl::setMatrices(mCam);
 
-    gl::setMatricesWindow( getWindowSize() );
-    gl::enableAlphaBlending();
-    gl::clear( Color( 0, 0, 0 ) );
-    gl::color( Color::white() );
-    mTextureFont->drawString( "hello" , vec2{0, 0} );
+        for (int i = 0; i < mTile.size(); i++) {
+            mTile[i]->draw();
+        }
+    //    gl::color(.2f, .8f, .2f);
+    //    gl::drawCube( vec3{}, vec3{1} );
+        snake.callOnEach( std::bind(&SnakeGame::drawSnakeCube, &(*this), std::placeholders::_1, std::placeholders::_2) );
+
+        auto food = snake.getFood();
+        gl::BatchRef foodBox;
+        auto c = Color(.8f, .2f, .2f);
+        auto color = geom::Constant(geom::COLOR, c);
+        auto trans = geom::Translate( 1.f / (tilesWide + 1) * (food.first + 1) * 2 - 1, 1.f / (tilesHigh + 1) * (food.second + 1) * 2 - 1, .2f );
+        auto scale = geom::Scale(tileScale);
+        foodBox = gl::Batch::create( geom::Cube() >> scale >> trans >> color, mShader);
+        foodBox->draw();
+    } {
+        gl::disableDepthRead();
+        gl::disableDepthWrite();
+        gl::ScopedModelMatrix scpModelMtx;
+        gl::setMatricesWindow( getWindowSize() );
+        gl::enableAlphaBlending();
+        gl::color( Color::white() );
+        mTextureFont->drawString( "hello", vec2( getWindowWidth() / 2, getWindowHeight() / 2 - mTextureFont->getDescent() ) );
+    }
 }

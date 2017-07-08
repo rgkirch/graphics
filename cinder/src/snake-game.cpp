@@ -11,19 +11,15 @@ void SnakeGame::keyDown(KeyEvent event )
             break;
         case KeyEvent::KEY_UP:
             snake.up();
-            snake.step();
             break;
         case KeyEvent::KEY_DOWN:
             snake.down();
-            snake.step();
             break;
         case KeyEvent::KEY_LEFT:
             snake.left();
-            snake.step();
             break;
         case KeyEvent::KEY_RIGHT:
             snake.right();
-            snake.step();
             break;
     }
 }
@@ -37,7 +33,7 @@ void SnakeGame::setup()
 {
     mFont = Font( "Times New Roman", 24 );
     mTextureFont = gl::TextureFont::create( mFont );
-    XmlTree doc(loadFile( "/home/richie/Documents/rgkirch/glfw/cinder/assets/values.xml" ));
+    XmlTree doc(loadFile( "/home/richie/Documents/rgkirch/graphics/cinder/assets/values.xml" ));
     tilesWide = doc.getChild("snakeGame/tilesWide").getValue<int>();
     tilesHigh = doc.getChild("snakeGame/tilesHigh").getValue<int>();
     tileScale = doc.getChild("snakeGame/tilesScale").getValue<float>();
@@ -84,6 +80,7 @@ void SnakeGame::draw() {
         }
     //    gl::color(.2f, .8f, .2f);
     //    gl::drawCube( vec3{}, vec3{1} );
+        snake.step();
         snake.callOnEach( std::bind(&SnakeGame::drawSnakeCube, &(*this), std::placeholders::_1, std::placeholders::_2) );
 
         auto food = snake.getFood();

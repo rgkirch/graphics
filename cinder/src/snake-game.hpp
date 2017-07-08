@@ -35,7 +35,7 @@ public:
 
 auto settingsFn = [] ( App::Settings *settings )->void {
     settings->setFullScreen( false );
-    settings->setWindowSize( 400,400 );
+    settings->setWindowSize( 800,800 );
 };
 CINDER_APP(
     SnakeGame,

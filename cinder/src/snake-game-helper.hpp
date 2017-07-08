@@ -23,17 +23,8 @@ private:
     std::pair<int, int> food;
     std::pair<int, int> direction;
     static std::pair<int, int> newFood(int width, int height, std::list<std::pair<int, int>> snake);
-    bool isSnakeHere(int x, int y);
 };
 
-bool SnakeInABox::isSnakeHere(int x, int y) {
-    for(auto t : snake) {
-        if(t.first == x && t.second == y) {
-            return true;
-        }
-    }
-    return false;
-}
 std::pair<int, int> SnakeInABox::newFood(int width, int height, std::list<std::pair<int, int>> snake) {
     assert(snake.size() < width * height);
     int x,y;
@@ -58,25 +49,29 @@ std::pair<int, int> SnakeInABox::newFood(int width, int height, std::list<std::p
 
 }
 void SnakeInABox::step() {
-    int x, y;
-    std::tie(x, y) = snake.front();
-    x += direction.first;
-    y += direction.second;
-    auto end = --std::end(snake);
-    auto begin = std::begin(snake);
-    bool stop = std::find(begin, end, std::make_pair(x,y)) != end;
-    snake.push_front( {x, y} );
-    if(x < boxWidth && x >= 0 && y < boxHeight && y >= 0 && !stop) {
-        if(x == food.first && y == food.second) {
-            food = newFood(boxWidth, boxHeight, snake);
+    static auto lastStep = std::chrono::system_clock::now();
+    if(std::chrono::system_clock::now() - lastStep > std::chrono::milliseconds(200)) {
+        lastStep = std::chrono::system_clock::now();
+        int x, y;
+        std::tie(x, y) = snake.front();
+        x += direction.first;
+        y += direction.second;
+        auto end = --std::end(snake);
+        auto begin = std::begin(snake);
+        bool stop = std::find(begin, end, std::make_pair(x,y)) != end;
+        snake.push_front( {x, y} );
+        if(x < boxWidth && x >= 0 && y < boxHeight && y >= 0 && !stop) {
+            if(x == food.first && y == food.second) {
+                food = newFood(boxWidth, boxHeight, snake);
+            } else {
+                snake.pop_back();
+            }
         } else {
-            snake.pop_back();
+            snake.clear();
+            snake.push_front( {0,0} );
+            direction = {1, 0};
+            food = newFood(boxWidth, boxHeight, snake);
         }
-    } else {
-        snake.clear();
-        snake.push_front( {0,0} );
-        direction = {1, 0};
-        food = newFood(boxWidth, boxHeight, snake);
     }
 }
 void SnakeInABox::up() {

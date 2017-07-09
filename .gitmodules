@@ -4,3 +4,6 @@
 [submodule "cinder/lib/googletest"]
 	path = cinder/lib/googletest
 	url = https://github.com/google/googletest
+[submodule "cinder/lib/json"]
+	path = cinder/lib/json
+	url = https://github.com/nlohmann/json

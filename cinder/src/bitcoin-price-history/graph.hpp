@@ -19,6 +19,7 @@ public:
     gl::GlslProgRef mShader;
 //    std::vector< gl::BatchRef > mTile;
     std::vector<vec2> points;
+//    std::cout << i["close"] << " " << i["date"] << " " << i["high"] << " " << i["low"] << " " << i["open"] << " " << i["quoteVolume"] << " " << i["volume"] << " " << i["weightedAverage"] << std::endl;
 //    Font mFont;
 //    gl::TextureFontRef mTextureFont;
 };

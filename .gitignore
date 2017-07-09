@@ -35,3 +35,4 @@ stb/
 /cinder/lib/googletest/
 /.idea/
 /cmake-build-debug/
+/cinder/lib/json/

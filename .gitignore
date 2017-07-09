@@ -31,3 +31,5 @@
 stb/
 *.swo
 *.pyc
+/cinder/lib/Cinder/
+/cinder/lib/googletest/

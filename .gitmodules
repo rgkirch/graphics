@@ -1,0 +1,6 @@
+[submodule "cinder/lib/Cinder"]
+	path = cinder/lib/Cinder
+	url = https://github.com/cinder/Cinder
+[submodule "cinder/lib/googletest"]
+	path = cinder/lib/googletest
+	url = https://github.com/google/googletest

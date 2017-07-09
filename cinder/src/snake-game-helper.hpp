@@ -17,6 +17,7 @@ public:
     void left();
     std::pair<int, int> getFood();
     void step();
+    int bestScore;
 private:
     int boxWidth, boxHeight;
     std::list<std::pair<int, int>> snake;
@@ -63,6 +64,9 @@ void SnakeInABox::step() {
         if(x < boxWidth && x >= 0 && y < boxHeight && y >= 0 && !stop) {
             if(x == food.first && y == food.second) {
                 food = newFood(boxWidth, boxHeight, snake);
+                if(snake.size() > bestScore) {
+                    bestScore = snake.size();
+                }
             } else {
                 snake.pop_back();
             }

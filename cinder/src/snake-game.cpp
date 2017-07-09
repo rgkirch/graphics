@@ -98,6 +98,6 @@ void SnakeGame::draw() {
         gl::setMatricesWindow( getWindowSize() );
         gl::enableAlphaBlending();
         gl::color( Color::white() );
-        mTextureFont->drawString( "hello", vec2( getWindowWidth() / 2, getWindowHeight() / 2 - mTextureFont->getDescent() ) );
+        mTextureFont->drawString( toString(snake.bestScore), vec2( getWindowWidth() / 2, getWindowHeight() / 2 - mTextureFont->getDescent() ) );
     }
 }

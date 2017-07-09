@@ -34,3 +34,4 @@ stb/
 /cinder/lib/Cinder/
 /cinder/lib/googletest/
 /.idea/
+/cmake-build-debug/

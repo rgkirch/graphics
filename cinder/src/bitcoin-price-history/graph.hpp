@@ -14,12 +14,13 @@ public:
     void setup() override;
     void draw() override;
     void resize() override;
-    void keyDown( KeyEvent event ) override;
+    void mouseDown(MouseEvent event) override;
     CameraPersp mCam;
     gl::GlslProgRef mShader;
-    std::vector< gl::BatchRef > mTile;
-    Font mFont;
-    gl::TextureFontRef mTextureFont;
+//    std::vector< gl::BatchRef > mTile;
+    std::vector<vec2> points;
+//    Font mFont;
+//    gl::TextureFontRef mTextureFont;
 };
 
 auto settingsFn = [] ( App::Settings *settings )->void {

@@ -10,7 +10,7 @@
 #include "cinder/app/KeyEvent.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
-#include "snake-game-helper.hpp"
+#include "snakeInABox.hpp"
 
 using namespace ci;
 using namespace ci::app;

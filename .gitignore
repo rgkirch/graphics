@@ -33,3 +33,4 @@ stb/
 *.pyc
 /cinder/lib/Cinder/
 /cinder/lib/googletest/
+/.idea/

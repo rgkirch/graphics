@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include "cinder/Xml.h"
 #include "cinder/app/App.h"
 #include "cinder/app/KeyEvent.h"
@@ -19,7 +20,9 @@ public:
     gl::GlslProgRef mShader;
 //    std::vector< gl::BatchRef > mTile;
     std::vector<vec2> points;
-//    std::cout << i["close"] << " " << i["date"] << " " << i["high"] << " " << i["low"] << " " << i["open"] << " " << i["quoteVolume"] << " " << i["volume"] << " " << i["weightedAverage"] << std::endl;
+    std::unordered_map<std::string, std::vector<float>> data { {"close", {}}, {"date", {}}, {"high", {}}, {"low", {}}, {"open", {}}, {"quoteVolume", {}}, {"volume", {}}, {"weightedAverage", {}} };
+    std::vector<std::string> dataKeys {"close", "date", "high", "low", "open", "quoteVolume", "volume", "weightedAverage"};
+    ci::Path2d path;
 //    Font mFont;
 //    gl::TextureFontRef mTextureFont;
 };

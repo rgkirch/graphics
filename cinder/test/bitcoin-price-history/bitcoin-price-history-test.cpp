@@ -1,3 +1,4 @@
+#include <unordered_map>
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../../src/bitcoin-price-history/bitcoin.hpp"
@@ -7,7 +8,7 @@ using json = nlohmann::json;
 
 TEST(download, test) {
     HTTPDownloader downloader;
-    std::string content = downloader.download("https://poloniex.com/public?command=returnChartData&currencyPair=BTC_XMR&start=1496970103&end=9999999999&period=86400");
+    std::string content = downloader.download("https://poloniex.com/public?command=returnChartData&currencyPair=USDT_BTC&start=1496970103&end=9999999999&period=86400");
     std::cout << std::endl << content << std::endl;
 }
 
@@ -21,9 +22,26 @@ TEST(parse, test) {
 
 TEST(downloadParse, test) {
     HTTPDownloader downloader;
-    std::string content = downloader.download("https://poloniex.com/public?command=returnChartData&currencyPair=BTC_XMR&start=1496970103&end=9999999999&period=86400");
+    std::string content = downloader.download("https://poloniex.com/public?command=returnChartData&currencyPair=USDT_BTC&start=1496970103&end=9999999999&period=86400");
     auto j = json::parse(content);
     for(auto i : j) {
         std::cout << i["close"] << " " << i["date"] << " " << i["high"] << " " << i["low"] << " " << i["open"] << " " << i["quoteVolume"] << " " << i["volume"] << " " << i["weightedAverage"] << std::endl;
     }
+}
+
+TEST(umm, mapTest) {
+    std::unordered_map<std::string, std::vector<float>> data
+    {
+        {"close", {}},
+        {"date", {}},
+        {"high", {}},
+        {"low", {}},
+        {"open", {}},
+        {"quoteVolume", {}},
+        {"volume", {}},
+        {"weightedAverage", {}}
+    };
+    data["close"].push_back(3.9);
+    std::cout << std::endl << data["close"].front() << std::endl;
+    ASSERT_FLOAT_EQ(3.9f, data["close"].front());
 }

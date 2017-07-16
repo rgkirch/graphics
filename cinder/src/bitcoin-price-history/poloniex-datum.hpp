@@ -1,3 +1,4 @@
+#pragma once
 #ifndef MYPROJECT_POLONIEX_DATA_H
 #define MYPROJECT_POLONIEX_DATA_H
 

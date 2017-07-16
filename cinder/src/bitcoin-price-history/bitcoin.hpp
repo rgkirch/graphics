@@ -1,4 +1,7 @@
 #pragma once
+#ifndef BITCOIN_HPP
+#define BITCOIN_HPP
+
 
 #include <curl/curl.h>
 #include <curl/curlbuild.h>
@@ -44,3 +47,4 @@ string HTTPDownloader::download(const std::string& url) {
     }
     return out.str();
 }
+#endif

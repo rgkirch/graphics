@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
-<snakeGame>
-    <tilesWide>8</tilesWide>
-    <tilesHigh>8</tilesHigh>
-    <tilesScale>.2</tilesScale>
-</snakeGame>
+<data>
+    <snakeGame>
+        <tilesWide>8</tilesWide>
+        <tilesHigh>8</tilesHigh>
+        <tilesScale>.2</tilesScale>
+    </snakeGame>
+    <poloniexData>
+        <file>small-poloniex-data.json</file>
+        <file>two-years-poloniex-btc.json</file>
+    </poloniexData>
+</data>

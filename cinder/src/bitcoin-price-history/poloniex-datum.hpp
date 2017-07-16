@@ -34,7 +34,7 @@ namespace Poloniex {
             return currencyPair;
         }
 
-        Request& setCurrencyPair(string currencyPair) {
+        Request &setCurrencyPair(string currencyPair) {
             Request::currencyPair = currencyPair;
             return *this;
         }
@@ -43,7 +43,7 @@ namespace Poloniex {
             return start;
         }
 
-        Request& setStart(long start) {
+        Request &setStart(long start) {
             Request::start = start;
             return *this;
         }
@@ -52,7 +52,7 @@ namespace Poloniex {
             return end;
         }
 
-        Request& setEnd(long end) {
+        Request &setEnd(long end) {
             Request::end = end;
             return *this;
         }
@@ -61,8 +61,13 @@ namespace Poloniex {
             return period;
         }
 
-        Request& setPeriod(long period) {
-            Request::period = period;
+        Request &setPeriod(long period) {
+            if (period == 300 || period == 900 || period == 1800 || period == 7200 || period == 14400 ||
+                period == 86400) {
+                Request::period = period;
+            } else {
+                Request::period = 86400;
+            }
             return *this;
         }
     };

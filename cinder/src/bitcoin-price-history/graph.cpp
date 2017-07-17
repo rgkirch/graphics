@@ -12,23 +12,25 @@ void BitcoinPriceHistory::setup() {
     Poloniex::Request request;
     request.setCurrencyPair("USDT_BTC").setStart(1496970103L).setEnd(9999999999L).setPeriod(86400L);
 //    auto history = downloadData(request);
-    auto history = Poloniex::dataFromFile("/home/richie/Documents/rgkirch/glfw/cinder/assets/two-years-poloniex-btc.json");
-#define ITERIFY(x) std::begin(x), std::end(x)
-    double max = *std::max_element(ITERIFY(history.close));
-    std::vector<float> pixelHeights;
-    std::transform(ITERIFY(history.close),
-                   std::back_inserter(pixelHeights),
-                   std::bind(
-                           [](double d, double max, int windowHeight) -> double {
-                               return (1 - (d / max)) * (windowHeight - 1);
-                           },
-                           std::placeholders::_1, max, getWindowHeight()));
-    path.moveTo(vec2{0, pixelHeights.front()});
-    for (int i = 1; i < pixelHeights.size(); i++) {
-        auto v = vec2{(float) i / pixelHeights.size() * getWindowWidth(),
-                      pixelHeights[i]};
-//        console() << v << std::endl;
-        path.lineTo(v);
+    auto history = Poloniex::dataFromFile("/home/richie/Documents/rgkirch/graphics/cinder/assets/two-years-poloniex-btc.json");
+    if(history) {
+        #define ITERIFY(x) std::begin(x), std::end(x)
+        double max = *std::max_element(ITERIFY(history.get().close));
+        std::vector<float> pixelHeights;
+        std::transform(ITERIFY(history.get().close),
+                       std::back_inserter(pixelHeights),
+                       std::bind(
+                               [](double d, double max, int windowHeight) -> double {
+                                   return (1 - (d / max)) * (windowHeight - 1);
+                               },
+                               std::placeholders::_1, max, getWindowHeight()));
+        path.moveTo(vec2{0, pixelHeights.front()});
+        for (int i = 1; i < pixelHeights.size(); i++) {
+            auto v = vec2{(float) i / pixelHeights.size() * getWindowWidth(),
+                          pixelHeights[i]};
+//            console() << v << std::endl;
+            path.lineTo(v);
+        }
     }
 }
 

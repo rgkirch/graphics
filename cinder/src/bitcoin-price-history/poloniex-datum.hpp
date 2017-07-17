@@ -144,13 +144,13 @@ namespace Poloniex {
             for (auto r : j) {
                 history.push_back(r);
             }
-            return boost::optional<History>(history);
+            return history;
         } else {
             return boost::optional<History>();
         }
     }
 
-    History downloadData(Request request) {
+    boost::optional<History> downloadData(Request request) {
         HTTPDownloader downloader;
         auto content = downloader.download(request);
         auto j = json::parse(content);

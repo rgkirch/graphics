@@ -1,5 +1,4 @@
 #include "graph.hpp"
-#include "bitcoin.hpp"
 #include "json.hpp"
 #include "poloniex-datum.hpp"
 
@@ -12,9 +11,10 @@ void BitcoinPriceHistory::setup() {
     Poloniex::Request request;
     request.setCurrencyPair("USDT_BTC").setStart(1496970103L).setEnd(9999999999L).setPeriod(86400L);
 //    auto history = downloadData(request);
-    auto history = Poloniex::dataFromFile("/home/richie/Documents/rgkirch/graphics/cinder/assets/two-years-poloniex-btc.json");
-    if(history) {
-        #define ITERIFY(x) std::begin(x), std::end(x)
+    auto history = Poloniex::dataFromFile(
+            "/home/richie/Documents/rgkirch/graphics/cinder/assets/two-years-poloniex-btc.json");
+    if (history) {
+#define ITERIFY(x) std::begin(x), std::end(x)
         double max = *std::max_element(ITERIFY(history.get().close));
         std::vector<float> pixelHeights;
         std::transform(ITERIFY(history.get().close),

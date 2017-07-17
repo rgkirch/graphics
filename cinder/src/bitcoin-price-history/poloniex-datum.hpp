@@ -131,6 +131,19 @@ namespace Poloniex {
         vector<double> weightedAverage;
     };
 
+    History dataFromFile(string filename) {
+        std::ifstream file;
+        file.open(filename, std::ios_base::in);
+        string content;
+        file >> content;
+        auto j = json::parse(content);
+        History history(j.size());
+        for (auto r : j) {
+            history.push_back(r);
+        }
+        return history;
+    }
+
     History downloadData(Request request) {
         HTTPDownloader downloader;
         auto content = downloader.download(request);

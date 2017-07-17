@@ -21,7 +21,7 @@ private:
     void* curl;
 };
 
-size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
+size_t write_data_dalala(void *ptr, size_t size, size_t nmemb, void *stream) {
     string data((const char*) ptr, (size_t) size * nmemb);
     *((stringstream*) stream) << data;
     return size * nmemb;
@@ -38,7 +38,7 @@ string HTTPDownloader::download(const std::string& url) {
     curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
     curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "deflate");
     std::stringstream out;
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data_dalala);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &out);
     CURLcode res = curl_easy_perform(curl);
     if (res != CURLE_OK) {

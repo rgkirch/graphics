@@ -1,6 +1,4 @@
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
-#include "../../src/bitcoin-price-history/poloniex-datum.hpp"
 //#include "cinder/Xml.h"
 
 using std::string;

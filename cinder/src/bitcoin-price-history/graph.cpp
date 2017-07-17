@@ -11,7 +11,8 @@ void BitcoinPriceHistory::setup() {
 
     Poloniex::Request request;
     request.setCurrencyPair("USDT_BTC").setStart(1496970103L).setEnd(9999999999L).setPeriod(86400L);
-    auto history = downloadData(request);
+//    auto history = downloadData(request);
+    auto history = Poloniex::dataFromFile("/home/richie/Documents/rgkirch/glfw/cinder/assets/two-years-poloniex-btc.json");
 #define ITERIFY(x) std::begin(x), std::end(x)
     double max = *std::max_element(ITERIFY(history.close));
     std::vector<float> pixelHeights;
@@ -26,7 +27,7 @@ void BitcoinPriceHistory::setup() {
     for (int i = 1; i < pixelHeights.size(); i++) {
         auto v = vec2{(float) i / pixelHeights.size() * getWindowWidth(),
                       pixelHeights[i]};
-        console() << v << std::endl;
+//        console() << v << std::endl;
         path.lineTo(v);
     }
 }

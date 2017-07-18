@@ -75,9 +75,17 @@ void BitcoinPriceHistory::mouseDown(MouseEvent event) {
 void BitcoinPriceHistory::draw() {
     gl::clear();
     gl::setMatricesWindow(getWindowSize());
+//    gl::setMatrices(mCam);
 //    gl::color(Color::white());
-    for(int i = 0; i < paths.size(); i++) {
-        gl::color( Color( CM_HSV, i / (float)paths.size(), 1, 1 ) );
+    float mouseX = (getMousePos().x / (float)getWindowWidth() - .5f) * getWindowWidth();
+    float mouseY = (getMousePos().y / (float)getWindowHeight() - .5f) * getWindowHeight();
+    float scale = 2.f;
+    gl::translate(mouseX * scale, mouseY * scale);
+    gl::scale(scale, scale);
+//    auto scale = geom::Scale(tileScale);
+//    foodBox = gl::Batch::create( geom::Cube() >> scale >> trans >> color, mShader);
+    for (int i = 0; i < paths.size(); i++) {
+        gl::color(Color(CM_HSV, i / (float) paths.size(), 1, 1));
         gl::draw(paths[i]);
     }
 }

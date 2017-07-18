@@ -26,21 +26,23 @@ public:
     gl::GlslProgRef mShader;
 //    std::vector< gl::BatchRef > mTile;
     std::vector<vec2> points;
-    ci::Path2d path;
+    vector<ci::Path2d> paths;
 
 //    Font mFont;
 //    gl::TextureFontRef mTextureFont;
 
-    vector<float> mapValuesToPixels(Poloniex::History history) const;
+    vector<float> mapValuesToPixels(vector<double> history) const;
 
     boost::optional<Poloniex::History> getDataFromFileOrInternet() const;
 
     boost::optional<XmlTree> loadXmlTreeFromFile(string fileToLoadFrom) const;
+
+    Path2d pointsToPath(vector<double> points) const;
 };
 
 auto settingsFn = [](App::Settings *settings) -> void {
     settings->setFullScreen(false);
-    settings->setWindowSize(800, 800);
+    settings->setWindowSize(1920, 1080);
 };
 
 CINDER_APP(

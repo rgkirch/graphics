@@ -28,11 +28,11 @@ boost::optional<Poloniex::History> BitcoinPriceHistory::getDataFromFileOrInterne
     return history;
 }
 
-vector<float> BitcoinPriceHistory::mapValuesToPixels(Poloniex::History history) const {
+vector<float> BitcoinPriceHistory::mapValuesToPixels(vector<double> history) const {
 #define ITERIFY(x) std::begin(x), std::end(x)
-    double max = *max_element(ITERIFY(history.close));
+    double max = *max_element(ITERIFY(history));
     vector<float> pixelHeights;
-    transform(ITERIFY(history.close),
+    transform(ITERIFY(history),
               back_inserter(pixelHeights),
               bind(
                       [](double d, double max, int windowHeight) -> double {
@@ -43,19 +43,28 @@ vector<float> BitcoinPriceHistory::mapValuesToPixels(Poloniex::History history) 
     return pixelHeights;
 }
 
+ci::Path2d BitcoinPriceHistory::pointsToPath(std::vector<double> points) const {
+    ci::Path2d path;
+    auto pixelHeights = mapValuesToPixels(points);
+    path.moveTo(vec2{0, pixelHeights.front()});
+    for (int i = 1; i < pixelHeights.size(); i++) {
+        auto v = vec2{(float) i / pixelHeights.size() * getWindowWidth(),
+                      pixelHeights[i]};
+        path.lineTo(v);
+    }
+    return path;
+}
+
 void BitcoinPriceHistory::setup() {
     mShader = gl::getStockShader(gl::ShaderDef().lambert().color());
     mCam.lookAt(vec3(0, 0, 3), vec3(0, 0, 0));
 
     auto history = getDataFromFileOrInternet();
     if (history) {
-        auto pixelHeights = mapValuesToPixels(history.get());
-        path.moveTo(vec2{0, pixelHeights.front()});
-        for (int i = 1; i < pixelHeights.size(); i++) {
-            auto v = vec2{(float) i / pixelHeights.size() * getWindowWidth(),
-                          pixelHeights[i]};
-            path.lineTo(v);
-        }
+        paths.push_back(pointsToPath(history->high));
+        paths.push_back(pointsToPath(history->open));
+        paths.push_back(pointsToPath(history->close));
+        paths.push_back(pointsToPath(history->low));
     }
 }
 
@@ -66,8 +75,11 @@ void BitcoinPriceHistory::mouseDown(MouseEvent event) {
 void BitcoinPriceHistory::draw() {
     gl::clear();
     gl::setMatricesWindow(getWindowSize());
-    gl::color(Color::white());
-    gl::draw(path);
+//    gl::color(Color::white());
+    for(int i = 0; i < paths.size(); i++) {
+        gl::color( Color( CM_HSV, i / (float)paths.size(), 1, 1 ) );
+        gl::draw(paths[i]);
+    }
 }
 
 void BitcoinPriceHistory::resize() {

@@ -1,11 +1,13 @@
 #pragma once
 
 #include <unordered_map>
+#include <boost/optional.hpp>
 #include "cinder/Xml.h"
 #include "cinder/app/App.h"
 #include "cinder/app/KeyEvent.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
+#include "poloniex-datum.hpp"
 
 using namespace ci;
 using namespace ci::app;
@@ -25,8 +27,10 @@ public:
 //    std::vector< gl::BatchRef > mTile;
     std::vector<vec2> points;
     ci::Path2d path;
+
 //    Font mFont;
 //    gl::TextureFontRef mTextureFont;
+    boost::optional<Poloniex::History> getOptional() const;
 };
 
 auto settingsFn = [](App::Settings *settings) -> void {

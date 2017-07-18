@@ -6,7 +6,8 @@
         <tilesScale>.2</tilesScale>
     </snakeGame>
     <poloniexData>
-        <file>small-poloniex-data.json</file>
+        <dataSource>file</dataSource> <!--file or internet-->
+        <!--<file>small-poloniex-data.json</file>-->
         <file>two-years-poloniex-btc.json</file>
     </poloniexData>
 </data>

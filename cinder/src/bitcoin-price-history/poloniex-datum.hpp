@@ -146,7 +146,7 @@ namespace Poloniex {
             }
             return history;
         } else {
-            return boost::optional<History>();
+            return {};
         }
     }
 

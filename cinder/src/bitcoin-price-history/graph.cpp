@@ -3,7 +3,7 @@
 using json = nlohmann::json;
 using std::string;
 
-boost::optional<XmlTree> loadXmlTreeFromFile(std::string fileToLoadFrom) {
+boost::optional<XmlTree> BitcoinPriceHistory::loadXmlTreeFromFile(std::string fileToLoadFrom) const {
     if (boost::filesystem::exists(fileToLoadFrom)) {
         return XmlTree(loadFile(fileToLoadFrom));
     } else {
@@ -11,7 +11,7 @@ boost::optional<XmlTree> loadXmlTreeFromFile(std::string fileToLoadFrom) {
     }
 }
 
-boost::optional<Poloniex::History> getDataFromFileOrInternet() {
+boost::optional<Poloniex::History> BitcoinPriceHistory::getDataFromFileOrInternet() const {
     boost::optional<Poloniex::History> history;
     auto doc = loadXmlTreeFromFile("/home/richie/Documents/rgkirch/graphics/cinder/assets/values.xml");
     if (doc) {
@@ -22,10 +22,25 @@ boost::optional<Poloniex::History> getDataFromFileOrInternet() {
         } else {
             Poloniex::Request request;
             request.setCurrencyPair("USDT_BTC").setStart(1496970103L).setEnd(9999999999L).setPeriod(86400L);
-            history = downloadData(request);
+            history = Poloniex::downloadData(request);
         }
     }
     return history;
+}
+
+vector<float> BitcoinPriceHistory::mapValuesToPixels(Poloniex::History history) const {
+#define ITERIFY(x) std::begin(x), std::end(x)
+    double max = *max_element(ITERIFY(history.close));
+    vector<float> pixelHeights;
+    transform(ITERIFY(history.close),
+              back_inserter(pixelHeights),
+              bind(
+                      [](double d, double max, int windowHeight) -> double {
+                          return (1 - (d / max)) * (windowHeight - 1);
+                      },
+                      placeholders::_1, max, getWindowHeight()));
+#undef ITERIFY
+    return pixelHeights;
 }
 
 void BitcoinPriceHistory::setup() {
@@ -34,21 +49,11 @@ void BitcoinPriceHistory::setup() {
 
     auto history = getDataFromFileOrInternet();
     if (history) {
-#define ITERIFY(x) std::begin(x), std::end(x)
-        double max = *std::max_element(ITERIFY(history.get().close));
-        std::vector<float> pixelHeights;
-        std::transform(ITERIFY(history.get().close),
-                       std::back_inserter(pixelHeights),
-                       std::bind(
-                               [](double d, double max, int windowHeight) -> double {
-                                   return (1 - (d / max)) * (windowHeight - 1);
-                               },
-                               std::placeholders::_1, max, getWindowHeight()));
+        auto pixelHeights = mapValuesToPixels(history.get());
         path.moveTo(vec2{0, pixelHeights.front()});
         for (int i = 1; i < pixelHeights.size(); i++) {
             auto v = vec2{(float) i / pixelHeights.size() * getWindowWidth(),
                           pixelHeights[i]};
-//            console() << v << std::endl;
             path.lineTo(v);
         }
     }

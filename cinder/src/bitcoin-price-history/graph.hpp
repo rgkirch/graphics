@@ -30,7 +30,12 @@ public:
 
 //    Font mFont;
 //    gl::TextureFontRef mTextureFont;
-    boost::optional<Poloniex::History> getOptional() const;
+
+    vector<float> mapValuesToPixels(Poloniex::History history) const;
+
+    boost::optional<Poloniex::History> getDataFromFileOrInternet() const;
+
+    boost::optional<XmlTree> loadXmlTreeFromFile(string fileToLoadFrom) const;
 };
 
 auto settingsFn = [](App::Settings *settings) -> void {

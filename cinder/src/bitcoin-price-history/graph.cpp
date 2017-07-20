@@ -28,29 +28,11 @@ boost::optional<Poloniex::History> BitcoinPriceHistory::getDataFromFileOrInterne
     return history;
 }
 
-vector<float> BitcoinPriceHistory::mapValuesToPixels(vector<double> history) const {
-#define ITERIFY(x) std::begin(x), std::end(x)
-    double max = *max_element(ITERIFY(history));
-    vector<float> pixelHeights;
-    transform(ITERIFY(history),
-              back_inserter(pixelHeights),
-              bind(
-                      [](double d, double max, int windowHeight) -> double {
-                          return (1 - (d / max)) * (windowHeight - 1);
-                      },
-                      placeholders::_1, max, getWindowHeight()));
-#undef ITERIFY
-    return pixelHeights;
-}
-
 ci::Path2d BitcoinPriceHistory::pointsToPath(std::vector<double> points) const {
     ci::Path2d path;
-    auto pixelHeights = mapValuesToPixels(points);
-    path.moveTo(vec2{0, pixelHeights.front()});
-    for (int i = 1; i < pixelHeights.size(); i++) {
-        auto v = vec2{(float) i / pixelHeights.size() * getWindowWidth(),
-                      pixelHeights[i]};
-        path.lineTo(v);
+    path.moveTo(vec2{0, points.front()});
+    for (int i = 1; i < points.size(); i++) {
+        path.lineTo(vec2{i, points[i]});
     }
     return path;
 }
@@ -60,6 +42,7 @@ void BitcoinPriceHistory::setup() {
     mCam.lookAt(vec3(0, 0, 3), vec3(0, 0, 0));
 
     auto history = getDataFromFileOrInternet();
+    BitcoinPriceHistory::history = history;
     if (history) {
         paths.push_back(pointsToPath(history->high));
         paths.push_back(pointsToPath(history->open));
@@ -77,17 +60,22 @@ void BitcoinPriceHistory::draw() {
     gl::setMatricesWindow(getWindowSize());
 //    gl::setMatrices(mCam);
 //    gl::color(Color::white());
-    float mouseX = (getMousePos().x / (float)getWindowWidth() - .5f) * getWindowWidth();
-    float mouseY = (getMousePos().y / (float)getWindowHeight() - .5f) * getWindowHeight();
-    float scale = 2.f;
-    gl::translate(mouseX * scale, mouseY * scale);
-    gl::scale(scale, scale);
+//    float mouseX = (getMousePos().x / (float)getWindowWidth() - .5f) * getWindowWidth();
+//    float mouseY = (getMousePos().y / (float)getWindowHeight() - .5f) * getWindowHeight();
+//    gl::translate(mouseX * scale, mouseY * scale);
+//    gl::scale(getMousePos().x / 3000.f, 1);
 //    auto scale = geom::Scale(tileScale);
 //    foodBox = gl::Batch::create( geom::Cube() >> scale >> trans >> color, mShader);
     for (int i = 0; i < paths.size(); i++) {
         gl::color(Color(CM_HSV, i / (float) paths.size(), 1, 1));
         gl::draw(paths[i]);
     }
+//    if(history) {
+//        assert(history.get().close.size() == history.get().open.size());
+//        for(int i = 0; i < history.get().close.size(); i++) {
+//            gl::drawSolidRect( Rectf(vec2(1, history->open), vec2(1, history->close)) );
+//        }
+//    }
 }
 
 void BitcoinPriceHistory::resize() {

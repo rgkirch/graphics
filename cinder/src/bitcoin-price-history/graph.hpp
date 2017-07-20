@@ -31,13 +31,15 @@ public:
 //    Font mFont;
 //    gl::TextureFontRef mTextureFont;
 
-    vector<float> mapValuesToPixels(vector<double> history) const;
+    vector<float> mapValuesToPixels(vector<double> prices) const;
 
     boost::optional<Poloniex::History> getDataFromFileOrInternet() const;
 
     boost::optional<XmlTree> loadXmlTreeFromFile(string fileToLoadFrom) const;
 
     Path2d pointsToPath(vector<double> points) const;
+
+    boost::optional<Poloniex::History> history;
 };
 
 auto settingsFn = [](App::Settings *settings) -> void {

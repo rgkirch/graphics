@@ -51,8 +51,24 @@ void BitcoinPriceHistory::setup() {
     }
 }
 
+
+void BitcoinPriceHistory::mouseDrag(MouseEvent event) {
+    mousePosition = event.getPos();
+//    console() << event.getX() << " " << event.getY() << '\n';
+}
+
+void BitcoinPriceHistory::mouseUp(MouseEvent event) {
+    mouseDragged += mousePosition - mouseLastPressed;
+    mouseLastPressed = mousePosition;
+}
+
 void BitcoinPriceHistory::mouseDown(MouseEvent event) {
-    console() << vec2{event.getX(), event.getY()} << std::endl;
+    mouseLastPressed = event.getPos();
+    mousePosition = mouseLastPressed;
+}
+
+void BitcoinPriceHistory::mouseWheel(MouseEvent event) {
+    scale += event.getWheelIncrement();
 }
 
 void BitcoinPriceHistory::draw() {
@@ -62,8 +78,8 @@ void BitcoinPriceHistory::draw() {
 //    gl::color(Color::white());
 //    float mouseX = (getMousePos().x / (float)getWindowWidth() - .5f) * getWindowWidth();
 //    float mouseY = (getMousePos().y / (float)getWindowHeight() - .5f) * getWindowHeight();
-//    gl::translate(mouseX * scale, mouseY * scale);
-//    gl::scale(getMousePos().x / 3000.f, 1);
+    gl::translate(mouseDragged.x + (mousePosition.x - mouseLastPressed.x), mouseDragged.y + (mousePosition.y - mouseLastPressed.y));
+    gl::scale(scale);
 //    auto scale = geom::Scale(tileScale);
 //    foodBox = gl::Batch::create( geom::Cube() >> scale >> trans >> color, mShader);
 //    for (int i = 0; i < paths.size(); i++) {

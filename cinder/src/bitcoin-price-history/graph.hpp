@@ -27,17 +27,25 @@ public:
 //    std::vector< gl::BatchRef > mTile;
     std::vector<vec2> points;
     vector<ci::Path2d> paths;
+    vec2 mouseLastPressed;
+    vec2 mousePosition;
+    vec2 mouseDragged;
+    vec2 scale{1};
 
 //    Font mFont;
 //    gl::TextureFontRef mTextureFont;
-
-    vector<float> mapValuesToPixels(vector<double> prices) const;
 
     boost::optional<Poloniex::History> getDataFromFileOrInternet() const;
 
     boost::optional<XmlTree> loadXmlTreeFromFile(string fileToLoadFrom) const;
 
     Path2d pointsToPath(vector<double> points) const;
+
+    void mouseDrag(MouseEvent event) override;
+
+    void mouseWheel(MouseEvent event) override;
+
+    void mouseUp(MouseEvent event) override;
 
     boost::optional<Poloniex::History> history;
 };

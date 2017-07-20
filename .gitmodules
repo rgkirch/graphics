@@ -7,3 +7,6 @@
 [submodule "cinder/lib/json"]
 	path = cinder/lib/json
 	url = https://github.com/nlohmann/json
+[submodule "cinder/lib/benchmark"]
+	path = cinder/lib/benchmark
+	url = https://github.com/google/benchmark.git

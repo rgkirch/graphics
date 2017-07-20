@@ -66,16 +66,21 @@ void BitcoinPriceHistory::draw() {
 //    gl::scale(getMousePos().x / 3000.f, 1);
 //    auto scale = geom::Scale(tileScale);
 //    foodBox = gl::Batch::create( geom::Cube() >> scale >> trans >> color, mShader);
-    for (int i = 0; i < paths.size(); i++) {
-        gl::color(Color(CM_HSV, i / (float) paths.size(), 1, 1));
-        gl::draw(paths[i]);
-    }
-//    if(history) {
-//        assert(history.get().close.size() == history.get().open.size());
-//        for(int i = 0; i < history.get().close.size(); i++) {
-//            gl::drawSolidRect( Rectf(vec2(1, history->open), vec2(1, history->close)) );
-//        }
+//    for (int i = 0; i < paths.size(); i++) {
+//        gl::color(Color(CM_HSV, i / (float) paths.size(), 1, 1));
+//        gl::draw(paths[i]);
 //    }
+    if(history) {
+        assert(history.get().close.size() == history.get().open.size());
+        for(int i = 0; i < history.get().close.size(); i++) {
+            auto open = history->open[i];
+            auto close = history->close[i];
+            int red = ((int)close - (int)open) >> ((int)sizeof(close) * 8);
+            int green = ((int)open - (int)close) >> ((int)sizeof(close) * 8);
+            gl::color(red,green,0);
+            gl::drawSolidRect( Rectf(vec2(i - 1, open), vec2(i + 1, close)) );
+        }
+    }
 }
 
 void BitcoinPriceHistory::resize() {

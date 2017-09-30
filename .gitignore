@@ -36,3 +36,4 @@ stb/
 /.idea/
 /cmake-build-debug/
 /cinder/lib/json/
+/cinder/lib/benchmark/

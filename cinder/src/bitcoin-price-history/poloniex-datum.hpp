@@ -6,6 +6,8 @@
 #include <string>
 #include <json.hpp>
 #include "bitcoin.hpp"
+#include "boost/filesystem.hpp"
+#include "boost/optional.hpp"
 
 using std::vector;
 using std::string;
@@ -131,20 +133,24 @@ namespace Poloniex {
         vector<double> weightedAverage;
     };
 
-    History dataFromFile(string filename) {
-        std::ifstream file;
-        file.open(filename, std::ios_base::in);
-        string content;
-        file >> content;
-        auto j = json::parse(content);
-        History history(j.size());
-        for (auto r : j) {
-            history.push_back(r);
+    boost::optional<History> dataFromFile(string filename) {
+        if(boost::filesystem::exists(filename)) {
+            std::ifstream file;
+            file.open(filename, std::ios_base::in);
+            string content;
+            file >> content;
+            auto j = json::parse(content);
+            History history(j.size());
+            for (auto r : j) {
+                history.push_back(r);
+            }
+            return history;
+        } else {
+            return {};
         }
-        return history;
     }
 
-    History downloadData(Request request) {
+    boost::optional<History> downloadData(Request request) {
         HTTPDownloader downloader;
         auto content = downloader.download(request);
         auto j = json::parse(content);
